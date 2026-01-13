@@ -160,8 +160,6 @@ namespace DCGO_Tweaks
                 if (rt == active_card)
                 {
                     Quaternion no_rot = Quaternion.identity;
-                    Vector3 no_scale = Vector3.one;
-                    rt.set_localScale_Injected(ref no_scale);
                     rt.set_localRotation_Injected(ref no_rot);
                     continue;
                 }
