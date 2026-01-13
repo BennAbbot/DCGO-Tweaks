@@ -1,7 +1,9 @@
 ﻿using Il2Cpp;
 using Il2CppDG.Tweening;
 using MelonLoader;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace DCGO_Tweaks
 {
@@ -20,6 +22,9 @@ namespace DCGO_Tweaks
 
         public int PermanentAge { get; set; } = 0;
 
+        public List<RectTransform> ArrowRects { get; set; } = new List<RectTransform>();
+        Dictionary<RectTransform, Vector3> _arrow_target_map = new Dictionary<RectTransform, Vector3>();
+
         public void Awake()
         {
             RectTransform = GetComponent<RectTransform>();
@@ -29,6 +34,12 @@ namespace DCGO_Tweaks
         public void ResetPosition()
         {
             MovePosition(_inital_pos.x, 0.0f , true);
+        }
+
+        public void Update()
+        {
+            // Whould Love to move this from update but dont know how to add OnUpdate to DOAnchorPos
+            UpdateArrows();
         }
 
         public void MovePosition(float x_pos, float time, bool move_permanent)
@@ -63,6 +74,55 @@ namespace DCGO_Tweaks
             {
                 RectTransform.set_anchoredPosition_Injected(ref pos);
             }
+
+            UpdateArrows();
+        }
+
+        void UpdateArrows()
+        {
+            if (CardFrame.GetFramePermanent() != null)
+            {
+                for (int i = ArrowRects.Count - 1; i >= 0; i--)
+                {
+                    RectTransform arrow_rect = ArrowRects[i];
+                    if (arrow_rect == null || !arrow_rect.gameObject.activeSelf)
+                    {
+                        ArrowRects.RemoveAt(i);
+                        _arrow_target_map.Remove(arrow_rect);
+                        continue;
+                    }
+                    TargetArrow target_arrow = arrow_rect.GetComponent<TargetArrow>();
+                    RectTransform root_rect = target_arrow.RootRect;
+
+                    Vector3 arrow_pos = GetArrowPos();
+                    if (arrow_rect.localPosition != arrow_pos)
+                    {
+                        if (!_arrow_target_map.ContainsKey(arrow_rect))
+                        {
+                            float angle = root_rect.localRotation.eulerAngles.z * Mathf.Deg2Rad;
+                            float length = root_rect.sizeDelta.y;
+
+                            Vector3 new_target_pos = arrow_rect.localPosition + new Vector3(
+                                -Mathf.Sin(angle) * length,
+                                Mathf.Cos(angle) * length,
+                                0
+                            );
+                            _arrow_target_map.Add(arrow_rect, new_target_pos);
+                        }
+
+                        Vector3 target_pos = _arrow_target_map[arrow_rect];
+
+                        arrow_rect.localPosition = arrow_pos;
+
+                        Vector3 direction = target_pos - arrow_pos;
+                        float new_angle = Mathf.Atan2(-direction.x, direction.y) * Mathf.Rad2Deg;
+                        root_rect.localRotation = Quaternion.Euler(0, 0, new_angle);
+
+                        root_rect.sizeDelta = new Vector2(root_rect.sizeDelta.x,  direction.magnitude);
+                        target_arrow.TipRect.localPosition = new Vector3(0, root_rect.sizeDelta.y - 13, 0);
+                    }
+                }
+            }
         }
 
         public bool IsPermanentDirty()
@@ -74,6 +134,16 @@ namespace DCGO_Tweaks
             }
 
             return false;
+        }
+
+        public Vector3 GetArrowPos()
+        {
+            Vector3 pos = CardFrame.Frame.transform.localPosition + CardFrame.Frame.transform.parent.localPosition + CardFrame.Frame.transform.parent.parent.localPosition;
+            if (CardFrame.GetFramePermanent() != null)
+            {
+                pos += CardFrame.framePermanent.TopCard.Owner.playerUIObjectParent.localPosition;
+            }
+            return pos;
         }
     }
 }

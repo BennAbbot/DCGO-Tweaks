@@ -2,6 +2,7 @@
 using Il2Cpp;
 using MelonLoader;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.UI;
 
 namespace DCGO_Tweaks
@@ -35,7 +36,8 @@ namespace DCGO_Tweaks
         FrameComponentList _digimon_row = new FrameComponentList();
         FrameComponentList _tamer_row = new FrameComponentList();
 
-        FrameComponent _breeding_frame;
+        FrameComponentList _frames_with_new_permanents = new FrameComponentList();
+        FrameComponentList _frames_with_permanents = new FrameComponentList();
 
         int _age_counter = 0;
 
@@ -70,7 +72,6 @@ namespace DCGO_Tweaks
 
                 if (card_frame.isBreedingAreaFrame())
                 {
-                    frame_manager._breeding_frame = frame_comp;
                     continue;
                 }
 
@@ -101,8 +102,9 @@ namespace DCGO_Tweaks
 
         public void UpdateRow(FrameComponentList frame_row)
         {
-            FrameComponentList frames_with_new_permanents = new FrameComponentList();
-            FrameComponentList frames_with_permanents = new FrameComponentList();
+            _frames_with_new_permanents.Clear();
+            _frames_with_permanents.Clear();
+            bool do_spacing = false;
 
             foreach (var frame_comp in frame_row)
             {
@@ -110,39 +112,43 @@ namespace DCGO_Tweaks
 
                 if (permanent != null)
                 {
-                    frames_with_permanents.Add(frame_comp);
+                    _frames_with_permanents.Add(frame_comp);
                 }
 
                 if (frame_comp.IsPermanentDirty())
                 {
+                    do_spacing = true;
+
                     if (permanent == null)
                     {
+                        frame_comp.ResetPosition();
                         frame_comp.PermanentAge = 0;
                     }
                     else 
                     {
                         frame_comp.PermanentAge = ++_age_counter * (permanent.IsOption ? -1 : 1);
+                        _frames_with_new_permanents.Add(frame_comp);
                     }
-
-                    frames_with_new_permanents.Add(frame_comp);
                 }
             }
 
-            if (frames_with_new_permanents.Count > 0)
+            AsignArrows(_frames_with_permanents);
+
+            if (do_spacing)
             {
                 float total_space = _min_permanent_spacing * frame_row.Count;
-                float spacing = Math.Min(_max_permanent_spacing, total_space / frames_with_permanents.Count);
+                float spacing = Math.Min(_max_permanent_spacing, total_space / _frames_with_permanents.Count);
 
                 float offset = 0.0f;
 
                 if (frame_row == _tamer_row)
                 {
-                    if (frames_with_permanents.Count == 6)
+                    if (_frames_with_permanents.Count == 6)
                     {
                         spacing = _min_permanent_spacing;
                         offset = _min_permanent_spacing / 2.0f;
                     }
-                    else if (frames_with_permanents.Count > 6)
+                    else if (_frames_with_permanents.Count > 6)
                     {
                         spacing = _min_permanent_spacing;
                         offset = _min_permanent_spacing;
@@ -150,20 +156,42 @@ namespace DCGO_Tweaks
                 }
 
                 // Annoying, cant use .Sort so do it myself
-                for (int i = 0; i < frames_with_permanents.Count - 1; i++)
+                for (int i = 0; i < _frames_with_permanents.Count - 1; i++)
                 {
-                    for (int j = i + 1; j < frames_with_permanents.Count; j++)
+                    for (int j = i + 1; j < _frames_with_permanents.Count; j++)
                     {
-                        if (frames_with_permanents[i].PermanentAge * _sort_dir < _sort_dir * frames_with_permanents[j].PermanentAge)
+                        if (_frames_with_permanents[i].PermanentAge * _sort_dir < _sort_dir * _frames_with_permanents[j].PermanentAge)
                         {
-                            FrameComponent temp = frames_with_permanents[i];
-                            frames_with_permanents[i] = frames_with_permanents[j];
-                            frames_with_permanents[j] = temp;
+                            FrameComponent temp = _frames_with_permanents[i];
+                            _frames_with_permanents[i] = _frames_with_permanents[j];
+                            _frames_with_permanents[j] = temp;
                         }
                     }
                 }
 
-                SpaceRow(spacing, frames_with_permanents, frames_with_new_permanents, offset);
+                SpaceRow(spacing, _frames_with_permanents, _frames_with_new_permanents, offset);
+            }
+
+            void AsignArrows(FrameComponentList frame_list)
+            {
+                Transform arrow_parent = GManager.instance.targetArrowParent;
+                for (int i = 0; i < arrow_parent.childCount; i++)
+                {
+                    RectTransform arrow_rect = arrow_parent.GetChild(i).GetComponent<RectTransform>();
+                    if (arrow_rect == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (var frame in frame_list)
+                    {
+                        if (frame.GetArrowPos() == arrow_rect.localPosition && !frame.ArrowRects.Contains(arrow_rect))
+                        {
+                            frame.ArrowRects.Add(arrow_rect);
+                            break;
+                        }
+                    }
+                }
             }
 
             void SpaceRow(float spacing, FrameComponentList frames_with_permanents, FrameComponentList frames_with_new_permanents, float centre_offset)
@@ -172,15 +200,8 @@ namespace DCGO_Tweaks
                 foreach (var frame_comp in frames_with_permanents)
                 {
                     bool is_new = frames_with_new_permanents.Contains(frame_comp);
-                    if (frame_comp.CardFrame.GetFramePermanent() != null)
-                    {
-                        frame_comp.MovePosition((index * spacing) - ((frames_with_permanents.Count - 1) * spacing * 0.5f) + centre_offset, is_new ? 0.0f : 0.3f, !is_new);
-                        index++;
-                    }
-                    else if (is_new)
-                    {
-                        frame_comp.ResetPosition();
-                    }
+                    frame_comp.MovePosition((index * spacing) - ((frames_with_permanents.Count - 1) * spacing * 0.5f) + centre_offset, is_new ? 0.0f : 0.3f, !is_new);
+                    index++;
                 }
             }
         }
