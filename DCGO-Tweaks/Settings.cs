@@ -278,6 +278,9 @@ namespace DCGO_Tweaks
         private MelonPreferences_Entry<float> _feild_permanent_highlight_outline_scale;
         private MelonPreferences_Entry<bool> _feild_permanent_highlight_outline_glow;
         private MelonPreferences_Entry<bool> _feild_permanent_shadow;
+        private MelonPreferences_Entry<bool> _collapse_empty_space;
+        private MelonPreferences_Entry<float> _feild_permanent_max_spacing;
+        private MelonPreferences_Entry<float> _collapse_time;
 
 
         void InitFeildPermanentSettings()
@@ -285,10 +288,14 @@ namespace DCGO_Tweaks
             _feild_permanent_settings = MelonPreferences.CreateCategory("Feild_Permanent");
 
             _feild_permanent_outline_colour = _feild_permanent_settings.CreateEntry("Outline_Color", Color.black);
-            _feild_permanent_outline_scale = _trash_category.CreateEntry("Outline_Scale", 1.0f);
-            _feild_permanent_highlight_outline_scale = _trash_category.CreateEntry("Highlight_Outline_Scale", 1.0f);
+            _feild_permanent_outline_scale = _feild_permanent_settings.CreateEntry("Outline_Scale", 1.0f);
+            _feild_permanent_highlight_outline_scale = _feild_permanent_settings.CreateEntry("Highlight_Outline_Scale", 1.0f);
             _feild_permanent_highlight_outline_glow = _feild_permanent_settings.CreateEntry("Highlight_Outline_Glow", true);
-            _feild_permanent_shadow = _trash_category.CreateEntry("Shadow", true);
+            _feild_permanent_shadow = _feild_permanent_settings.CreateEntry("Shadow", true);
+
+            _collapse_empty_space = _feild_permanent_settings.CreateEntry("Collapse_Empty_Space", true);
+            _feild_permanent_max_spacing = _feild_permanent_settings.CreateEntry("Feild_Permanent_Max_Spacing", 160.0f);
+            _collapse_time = _feild_permanent_settings.CreateEntry("Collapse_Time", 0.3f);
 
             _feild_permanent_settings.SetFilePath(ConfigPath);
         }
@@ -298,6 +305,12 @@ namespace DCGO_Tweaks
         public float FeildPermanentHighlightOutlineScale() => _feild_permanent_highlight_outline_scale.Value;
         public bool FeildPermanentHighlightOutlineGlow() => _feild_permanent_highlight_outline_glow.Value;
         public bool FeildPermanentShadow() => _feild_permanent_shadow.Value;
+
+        public bool CollapseEmptySpace() => _collapse_empty_space.Value;
+
+        public float FeildPermanentMaxSpacing() => _feild_permanent_max_spacing.Value;
+
+        public float FeildCollapseTime() => _collapse_time.Value;
         #endregion
 
         #region Hand Settings
