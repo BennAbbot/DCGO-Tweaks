@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Il2Cpp;
+using UnityEngine;
 
 namespace DCGO_Tweaks
 {
@@ -21,6 +22,9 @@ namespace DCGO_Tweaks
         {
             BackgroundChanges.Apply(_scene_object_collection);
             CountInfoChanges.Apply(_scene_object_collection);
+
+            FrameManager.InitForPlayer(GManager.instance.You, sort_dir: 1);
+            FrameManager.InitForPlayer(GManager.instance.Opponent, sort_dir: - 1);
         }
 
         public void SceneUpdate()
