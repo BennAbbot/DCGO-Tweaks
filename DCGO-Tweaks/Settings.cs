@@ -280,6 +280,7 @@ namespace DCGO_Tweaks
         private MelonPreferences_Entry<bool> _feild_permanent_shadow;
         private MelonPreferences_Entry<bool> _collapse_empty_space;
         private MelonPreferences_Entry<float> _feild_permanent_max_spacing;
+        private MelonPreferences_Entry<float> _collapse_time;
 
 
         void InitFeildPermanentSettings()
@@ -294,6 +295,7 @@ namespace DCGO_Tweaks
 
             _collapse_empty_space = _feild_permanent_settings.CreateEntry("Collapse_Empty_Space", true);
             _feild_permanent_max_spacing = _feild_permanent_settings.CreateEntry("Feild_Permanent_Max_Spacing", 160.0f);
+            _collapse_time = _feild_permanent_settings.CreateEntry("Collapse_Time", 0.3f);
 
             _feild_permanent_settings.SetFilePath(ConfigPath);
         }
@@ -307,6 +309,8 @@ namespace DCGO_Tweaks
         public bool CollapseEmptySpace() => _collapse_empty_space.Value;
 
         public float FeildPermanentMaxSpacing() => _feild_permanent_max_spacing.Value;
+
+        public float FeildCollapseTime() => _collapse_time.Value;
         #endregion
 
         #region Hand Settings

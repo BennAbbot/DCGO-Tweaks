@@ -200,7 +200,7 @@ namespace DCGO_Tweaks
                 foreach (var frame_comp in frames_with_permanents)
                 {
                     bool is_new = frames_with_new_permanents.Contains(frame_comp);
-                    frame_comp.MovePosition((index * spacing) - ((frames_with_permanents.Count - 1) * spacing * 0.5f) + centre_offset, is_new ? 0.0f : 0.3f, !is_new);
+                    frame_comp.MovePosition((index * spacing) - ((frames_with_permanents.Count - 1) * spacing * 0.5f) + centre_offset, is_new ? 0.0f : Settings.Instance.FeildCollapseTime(), !is_new);
                     index++;
                 }
             }
