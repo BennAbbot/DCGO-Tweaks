@@ -1,4 +1,5 @@
-﻿using MelonLoader;
+﻿using DCGO_Tweaks.ModdedComponents;
+using MelonLoader;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using UnityEngine;
@@ -17,12 +18,12 @@ namespace DCGO_Tweaks
         volatile bool _is_loading = false;
         volatile float _total_duration;
 
-        public void AsyncLoad(FileInfo file_info)
+        public Task AsyncLoad(FileInfo file_info)
         {
-            //return Task.Run(() =>
-            //{
+            return Task.Run(() =>
+            {
                 Load(file_info.FullName);
-            //});
+            });
         }
 
         public bool IsLoading()
@@ -90,13 +91,26 @@ namespace DCGO_Tweaks
         {
             _is_loading = true;
 
-            FrameData GetFrameData(ImageFrame<Rgba32> frame, float duration)
+            FrameData GetFrameData(int width, int hight, Color32[] pixels, float duration)
             {
-                Texture2D texture = new Texture2D(frame.Width, frame.Height, TextureFormat.RGBA32, true);
+                Texture2D texture = new Texture2D(width, hight, TextureFormat.RGBA32, true);
 
-                Color32[] pixels = new Color32[frame.Width * frame.Height];
+                texture.hideFlags = HideFlags.DontUnloadUnusedAsset;
 
-                frame.ProcessPixelRows(accessor =>
+                texture.SetPixels32(pixels);
+                texture.Apply();
+
+                Sprite sprtie = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                sprtie.hideFlags = HideFlags.DontUnloadUnusedAsset;
+
+                return new FrameData () { Sprite = sprtie, Duration = duration };
+            }
+
+            Color32[] GetPixels(ImageFrame<Rgba32> image_frame)
+            {
+                Color32[] pixels = new Color32[image_frame.Width * image_frame.Height];
+
+                image_frame.ProcessPixelRows(accessor =>
                 {
                     for (int y = 0; y < accessor.Height; y++)
                     {
@@ -105,19 +119,14 @@ namespace DCGO_Tweaks
                         {
                             var pixel = pixel_row[x];
                             int unity_y = accessor.Height - 1 - y;
-                            pixels[unity_y * frame.Width + x] = new Color32(
+                            pixels[unity_y * image_frame.Width + x] = new Color32(
                                 pixel.R, pixel.G, pixel.B, pixel.A
                             );
                         }
                     }
                 });
 
-                texture.SetPixels32(pixels);
-                texture.Apply();
-
-                Sprite sprtie = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-
-                return new FrameData () { Sprite = sprtie, Duration = duration };
+                return pixels;
             }
 
             try
@@ -135,46 +144,28 @@ namespace DCGO_Tweaks
                             var metadata = frame.Metadata.GetWebpMetadata();
                             float duration = metadata.FrameDelay / 1000f;
 
-                            Texture2D texture = new Texture2D(frame.Width, frame.Height, TextureFormat.RGBA32, true);
+                            _total_duration += duration;
 
-                            Color32[] pixels = new Color32[frame.Width * frame.Height];
+                            int width = frame.Width;
+                            int hight = frame.Height;
+                            Color32[] pixels = GetPixels(frame);
 
-                            frame.ProcessPixelRows(accessor =>
+                            MainThreadDispatcher.Instance.EnqueueImageLoad(new System.Action(() =>
                             {
-                                for (int y = 0; y < accessor.Height; y++)
-                                {
-                                    var pixel_row = accessor.GetRowSpan(y);
-                                    for (int x = 0; x < pixel_row.Length; x++)
-                                    {
-                                        var pixel = pixel_row[x];
-                                        int unity_y = accessor.Height - 1 - y;
-                                        pixels[unity_y * frame.Width + x] = new Color32(
-                                            pixel.R, pixel.G, pixel.B, pixel.A
-                                        );
-                                    }
-                                }
-                            });
-
-                            texture.SetPixels32(pixels);
-                            texture.Apply();
-
-                            Sprite sprtie = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-
-                            FrameData frame_data = new FrameData() { Sprite = sprtie, Duration = duration };
-
-                            lock (_frames)
-                            {
-                                _total_duration += frame_data.Duration;
-                                _frames.Add(frame_data);
-                            }
+                                _frames.Add(GetFrameData(width, hight, pixels, duration));
+                            }));
                         }
                     }
                     else
                     {
-                        lock (_frames)
+                        int width = image.Frames[0].Width;
+                        int hight = image.Frames[0].Height;
+                        Color32[] pixels = GetPixels(image.Frames[0]);
+
+                        MainThreadDispatcher.Instance.EnqueueImageLoad(new System.Action(() =>
                         {
-                            _frames.Add(GetFrameData(image.Frames[0], 0.0f));
-                        }
+                            _frames.Add(GetFrameData(width, hight, pixels, 0.0f));
+                        }));
                     }
                 }
             }

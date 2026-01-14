@@ -165,17 +165,6 @@ namespace DCGO_Tweaks
             }
         }
 
-        // Hack until I can figure out why Sprite are nuked when scene changes
-        public void CleanUpAnimatedImages()
-        {
-            foreach (var item in _animated_image_look_up)
-            {
-                AnimatedImageEntry entry = item.Value;
-                entry.Image = null;
-                _animated_image_look_up[item.Key] = entry;
-            }
-        }
-
         public void PreLoadImage(string image_name)
         {
             _ = GetAnimatedImage(image_name, true);

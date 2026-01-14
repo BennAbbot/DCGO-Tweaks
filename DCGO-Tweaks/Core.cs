@@ -1,4 +1,5 @@
-﻿using MelonLoader;
+﻿using DCGO_Tweaks.ModdedComponents;
+using MelonLoader;
 
 [assembly: MelonInfo(typeof(DCGO_Tweaks.Core), "DCGO Tweaks", "1.0.0", "Lv.B", null)]
 [assembly: MelonGame("DCGO", "DCGO")]
@@ -25,8 +26,8 @@ namespace DCGO_Tweaks
 
         public override void OnSceneWasLoaded(int build_index, string scene_name)
         {
+            MainThreadDispatcher.CreateDispatcher();
             AssetManager.Instance.LoadSceneSprites();
-            AssetManager.Instance.CleanUpAnimatedImages();
 
             switch (scene_name)
             {

@@ -340,6 +340,7 @@
 		<Compile Include="ModdedComponents\FrameComponent.cs" />
 		<Compile Include="ModdedComponents\FrameManager.cs" />
 		<Compile Include="ModdedComponents\HandCardMod.cs" />
+		<Compile Include="ModdedComponents\MainThreadDispatcher.cs" />
 		<Compile Include="ObjectCollection\BattleSceneCollection.cs" />
 		<Compile Include="SceneMod\BattleScene\BackgroundChanges.cs" />
 		<Compile Include="SceneMod\BattleScene\BattleUIChanges.cs" />
