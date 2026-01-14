@@ -1,5 +1,7 @@
 ﻿using Il2Cpp;
+using Il2CppMHLab.Patch.Core.IO;
 using UnityEngine;
+using static Il2CppSystem.Runtime.Remoting.RemotingServices;
 
 namespace DCGO_Tweaks
 {
@@ -16,8 +18,22 @@ namespace DCGO_Tweaks
             TrashChanges.Apply(_scene_object_collection);
             MemoryChanges.Apply(_scene_object_collection);
             HandChanges.Apply(_scene_object_collection);
-            
-        }
+
+            AssetManager asset_manager = AssetManager.Instance;
+
+            foreach (var deck in ContinuousController.instance.DeckDatas)
+            {
+                foreach (var card in deck.DeckCards())
+                {
+                    asset_manager.PreLoadImage(card.CardSpriteName);
+                }
+
+                foreach (var card in deck.DigitamaDeckCards())
+                {
+                    asset_manager.PreLoadImage(card.CardSpriteName);
+                }
+            }
+        } 
         public void OnSceneWasInitialized()
         {
             BackgroundChanges.Apply(_scene_object_collection);

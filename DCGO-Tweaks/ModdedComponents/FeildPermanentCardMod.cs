@@ -22,9 +22,17 @@ namespace DCGO_Tweaks
 
         GameObjectHandle _root_object;
 
+        FieldPermanentCard _feild_permanent_card = null;
+
+        CardSource _last_top_card = null;
+
+        AnimatedImageComp _animated_image_comp = null; 
+
         public void Start()
         {
             _root_object = new GameObjectHandle("Parent", gameObject);
+
+            _feild_permanent_card = GetComponent<FieldPermanentCard>();
 
             ApplyOutlineAndShadowChanges();
         }
@@ -35,6 +43,11 @@ namespace DCGO_Tweaks
 
             GameObject outline_obj = _root_object.Child("カード画像");
             Outline outline_comp = outline_obj != null ? outline_obj.GetComponent<Outline>() : null;
+
+            _animated_image_comp = outline_obj.AddComponent<AnimatedImageComp>();
+
+            _last_top_card = _feild_permanent_card.ThisPermanent?.TopCard;
+            UpdateAnimatedImage();
 
             if (outline_comp)
             {
@@ -63,9 +76,30 @@ namespace DCGO_Tweaks
             }
         }
 
-        void OnDestroy()
+        void LateUpdate()
         {
-            
+            CardSource top_card = _feild_permanent_card.ThisPermanent?.TopCard;
+            if (top_card != _last_top_card)
+            {
+                _last_top_card = top_card;
+
+                UpdateAnimatedImage();
+            }
+        }
+
+        void UpdateAnimatedImage()
+        {
+             CardSource top_card = _feild_permanent_card.ThisPermanent?.TopCard;
+
+            if (top_card != null)
+            {
+                string card_name = AssetManager.Instance.GetEntityFromCardIndex(top_card).CardSpriteName;
+                _animated_image_comp.AnimatedImage = AssetManager.Instance.GetAnimatedImage(card_name);
+            }
+            else
+            {
+                _animated_image_comp.AnimatedImage = null;
+            }
         }
     }
 }

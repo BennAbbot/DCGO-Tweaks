@@ -12,6 +12,7 @@ namespace DCGO_Tweaks
         public override void OnInitializeMelon()
         {
             Settings.Init();
+            AssetManager.Instance.FindAnimatedImages();
         }
 
         public override void OnUpdate()

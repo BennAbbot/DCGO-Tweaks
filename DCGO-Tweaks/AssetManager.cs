@@ -1,10 +1,13 @@
-﻿using Il2CppInterop.Runtime;
+﻿using Harmony;
+using Il2Cpp;
+using Il2CppInterop.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace DCGO_Tweaks
 {
@@ -102,7 +105,6 @@ namespace DCGO_Tweaks
             Texture2D tex = new Texture2D(1920, 1080);
             tex.LoadImage(bytes);
 
-
             return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100.0f);
         }
         #endregion
@@ -133,6 +135,83 @@ namespace DCGO_Tweaks
             }
 
             return _sprites[name];
+        }
+        #endregion
+
+        #region Animated Images
+
+        private struct AnimatedImageEntry
+        {
+            public AnimatedImageData Image;
+            public FileInfo FileInfo;
+        }
+
+        private Dictionary<string, AnimatedImageEntry> _animated_image_look_up = new Dictionary<string, AnimatedImageEntry>();
+
+        DirectoryInfo _animated_image_directory;
+
+        public void FindAnimatedImages()
+        {
+            string path = Application.dataPath;
+            _animated_image_directory = new DirectoryInfo(path);
+            _animated_image_directory = new DirectoryInfo(_animated_image_directory.Parent.Parent.FullName + "/Assets/Textures/Animated");
+
+            foreach (var file in _animated_image_directory.GetFiles())
+            {
+                if (file.Extension == ".webp")
+                {
+                    _animated_image_look_up.Add(System.IO.Path.GetFileNameWithoutExtension(file.Name), new AnimatedImageEntry { Image = null, FileInfo = file });
+                }
+            }
+
+            foreach (var item in _animated_image_look_up)
+            {
+                PreLoadImage(item.Key);
+            }
+        }
+
+        public void PreLoadImage(string image_name)
+        {
+            _ = GetAnimatedImage(image_name, true);
+        }
+
+        public bool HasAnimatedImage(string image_name)
+        {
+            return _animated_image_look_up.ContainsKey(image_name);
+        }
+
+        public CEntity_Base GetEntityFromCardIndex(CardSource card_source)
+        {
+            if (card_source == null)
+            {
+                return null;
+            }
+
+            // TODO: Find a better way to do this, getCardEntityByCardID looks slow but the index doesnt match any of the internal lists
+            return ContinuousController.instance.getCardEntityByCardID(card_source.CardEntityIndex);
+        }
+
+        public AnimatedImageData GetAnimatedImage(string image_name, bool load = true)
+        {
+            if (!HasAnimatedImage(image_name))
+            {
+                return null;
+            }
+
+            AnimatedImageEntry _animated_image_data = _animated_image_look_up[image_name];
+
+            if (_animated_image_data.Image == null)
+            {
+                _animated_image_data.Image = new DCGO_Tweaks.AnimatedImageData();
+                _animated_image_look_up[image_name] = _animated_image_data;
+
+                if (load)
+                {
+                    _animated_image_data.Image.AsyncLoad(_animated_image_data.FileInfo);
+                }
+            }
+
+            return _animated_image_data.Image;
         }
         #endregion
     }

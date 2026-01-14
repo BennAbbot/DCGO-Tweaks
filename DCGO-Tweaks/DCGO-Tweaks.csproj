@@ -330,10 +330,13 @@
 	<PropertyGroup>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Include="AnimatedImageData.cs" />
 		<Compile Include="AssetManager.cs" />
+		<Compile Include="ModdedComponents\AnimatedImageComp.cs" />
 		<Compile Include="ModdedComponents\FrameComponent.cs" />
 		<Compile Include="ModdedComponents\FrameManager.cs" />
 		<Compile Include="ModdedComponents\HandCardMod.cs" />
@@ -354,8 +357,16 @@
 		<Compile Include="Settings.cs" />
 		<Compile Include="Utils.cs" />
 	</ItemGroup>
-	
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="COPY &quot;$(TargetPath)&quot; &quot;D:\Documents\Digimon Sim\Game\Mods&quot;" />
-	</Target>
+
+	<ItemGroup>
+	  <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+	</ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <!-- Copy your mod DLL to Mods -->
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="D:\Documents\Digimon Sim\Game\Mods" />
+
+    <!-- Copy ImageSharp DLL to Dependencies -->
+    <Copy SourceFiles="$(TargetDir)SixLabors.ImageSharp.dll" DestinationFolder="D:\Documents\Digimon Sim\Game\MelonLoader\Dependencies" />
+  </Target>
 </Project>
