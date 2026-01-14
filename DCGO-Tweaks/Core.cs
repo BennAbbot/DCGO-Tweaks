@@ -26,6 +26,7 @@ namespace DCGO_Tweaks
         public override void OnSceneWasLoaded(int build_index, string scene_name)
         {
             AssetManager.Instance.LoadSceneSprites();
+            AssetManager.Instance.CleanUpAnimatedImages();
 
             switch (scene_name)
             {

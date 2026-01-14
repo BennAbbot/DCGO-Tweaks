@@ -12,7 +12,6 @@ namespace DCGO_Tweaks
             public Sprite Sprite;
             public float Duration;
         }
-       
 
         List<FrameData> _frames = new List<FrameData>();
         volatile bool _is_loading = false;

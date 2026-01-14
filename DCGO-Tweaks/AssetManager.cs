@@ -163,10 +163,16 @@ namespace DCGO_Tweaks
                     _animated_image_look_up.Add(System.IO.Path.GetFileNameWithoutExtension(file.Name), new AnimatedImageEntry { Image = null, FileInfo = file });
                 }
             }
+        }
 
+        // Hack until I can figure out why Sprite are nuked when scene changes
+        public void CleanUpAnimatedImages()
+        {
             foreach (var item in _animated_image_look_up)
             {
-                PreLoadImage(item.Key);
+                AnimatedImageEntry entry = item.Value;
+                entry.Image = null;
+                _animated_image_look_up[item.Key] = entry;
             }
         }
 
