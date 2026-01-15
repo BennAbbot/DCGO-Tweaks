@@ -22,7 +22,7 @@ namespace DCGO_Tweaks
 
         public int PermanentAge { get; set; } = 0;
 
-        public List<RectTransform> ArrowRects { get; set; } = new List<RectTransform>();
+        List<RectTransform> _arrow_rects = new List<RectTransform>();
         Dictionary<RectTransform, Vector3> _arrow_target_map = new Dictionary<RectTransform, Vector3>();
 
         public void Awake()
@@ -78,16 +78,25 @@ namespace DCGO_Tweaks
             UpdateArrows();
         }
 
+        public void AddArrowRect(RectTransform arrow_rect)
+        {
+            if (!_arrow_rects.Contains(arrow_rect))
+            {
+                _arrow_rects.Add(arrow_rect);
+            }
+            
+        }
+
         void UpdateArrows()
         {
             if (CardFrame.GetFramePermanent() != null)
             {
-                for (int i = ArrowRects.Count - 1; i >= 0; i--)
+                for (int i = _arrow_rects.Count - 1; i >= 0; i--)
                 {
-                    RectTransform arrow_rect = ArrowRects[i];
+                    RectTransform arrow_rect = _arrow_rects[i];
                     if (arrow_rect == null || !arrow_rect.gameObject.activeSelf)
                     {
-                        ArrowRects.RemoveAt(i);
+                        _arrow_rects.RemoveAt(i);
                         _arrow_target_map.Remove(arrow_rect);
                         continue;
                     }

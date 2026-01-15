@@ -185,9 +185,9 @@ namespace DCGO_Tweaks
 
                     foreach (var frame in frame_list)
                     {
-                        if (frame.GetArrowPos() == arrow_rect.localPosition && !frame.ArrowRects.Contains(arrow_rect))
+                        if (frame.GetArrowPos() == arrow_rect.localPosition)
                         {
-                            frame.ArrowRects.Add(arrow_rect);
+                            frame.AddArrowRect(arrow_rect);
                             break;
                         }
                     }
