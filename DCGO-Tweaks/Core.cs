@@ -12,6 +12,8 @@ namespace DCGO_Tweaks
         public override void OnInitializeMelon()
         {
             Settings.Init();
+            AssetManager.Instance.LoadUIAssets();
+            AssetManager.Instance.InitColours();
         }
 
         public override void OnUpdate()
