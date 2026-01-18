@@ -25,9 +25,9 @@ namespace DCGO_Tweaks
         GameObjectHandle _root_object;
         GameObjectHandle _image_object;
         GameObjectHandle _highlight_object;
-        GameObjectHandle _cost;
-        GameObjectHandle _evo_cost;
-        GameObjectHandle _dp;
+        GameObjectHandle _cost_ui;
+        GameObjectHandle _evo_cost_ui;
+        GameObjectHandle _dp_ui;
 
         HandCard _hand_card;
 
@@ -49,18 +49,22 @@ namespace DCGO_Tweaks
             _image_object = new GameObjectHandle("CardImage", _root_object);
             _highlight_object = new GameObjectHandle("Outline_Select", _root_object);
 
-            GameObject level = _root_object.Child("Level");
-
-            if (level != null)
+            if (Settings.Instance.DCGOTweaksHandInfoUIStyle())
             {
-                for (int i = 0; i < level.transform.GetChildCount(); i++)
+                GameObject level = _root_object.Child("Level");
+
+                if (level != null)
                 {
-                    level.transform.GetChild(i).gameObject.SetActive(false);
+                    for (int i = 0; i < level.transform.GetChildCount(); i++)
+                    {
+                        level.transform.GetChild(i).gameObject.SetActive(false);
+                    }
                 }
+
+                ApplyCostStyle();
+                ApplyDPStyle();
             }
 
-            ApplyCostStyle();
-            ApplyDPStyle();
             ApplyOutlineChanges();
         }
 
@@ -68,18 +72,18 @@ namespace DCGO_Tweaks
         {
             _hand_card.WhiteCircle = AssetManager.Instance.CostCircle;
 
-            _cost = new GameObjectHandle("Cost", _root_object);
-            _evo_cost = new GameObjectHandle("EvoCost", _root_object);
+            _cost_ui = new GameObjectHandle("Cost", _root_object);
+            _evo_cost_ui = new GameObjectHandle("EvoCost", _root_object);
 
-            if (_cost.GameObject == null || _evo_cost.GameObject == null)
+            if (_cost_ui.GameObject == null || _evo_cost_ui.GameObject == null)
             {
                 return;
             }
 
-            Utils.MoveUIItem(_cost, new Vector2(-35.35f, 55.6f));
-            Utils.ScaleUIItem(_cost, 0.75f);
+            Utils.MoveUIItem(_cost_ui, new Vector2(-35.35f, 55.6f));
+            Utils.ScaleUIItem(_cost_ui, 0.75f);
 
-            GameObject background = _cost.Child("background");
+            GameObject background = _cost_ui.Child("background");
             Image background_image = background.GetComponent<Image>();
             Outline background_outline = background.GetComponent<Outline>();
             Shadow background_shadow = background.AddComponent<Shadow>();
@@ -102,7 +106,7 @@ namespace DCGO_Tweaks
                 background_shadow.effectDistance = new Vector2(0, -2);
             }
 
-            GameObject cost_mask = _cost.Child("color mask");
+            GameObject cost_mask = _cost_ui.Child("color mask");
 
             cost_mask.transform.localScale = new Vector3(0.85f, 0.85f, 1.0f);
             cost_mask.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, -45.0f);
@@ -123,13 +127,13 @@ namespace DCGO_Tweaks
                 }
             }
 
-            Utils.MoveUIItem(_evo_cost, new Vector2(-38.5f, 12.6f));
-            Utils.ScaleUIItem(_evo_cost, 0.8f);
+            Utils.MoveUIItem(_evo_cost_ui, new Vector2(-38.5f, 12.6f));
+            Utils.ScaleUIItem(_evo_cost_ui, 0.8f);
 
             int evo_cost_index = 0;
-            for (int i = _evo_cost.GameObject.transform.GetChildCount() -1; i >= 0; i--)
+            for (int i = _evo_cost_ui.GameObject.transform.GetChildCount() -1; i >= 0; i--)
             {
-                Transform evo_cost = _evo_cost.GameObject.transform.GetChild(i);
+                Transform evo_cost = _evo_cost_ui.GameObject.transform.GetChild(i);
 
                 float hieght_offset = (evo_cost_index % 4) * 23;
                 evo_cost_index++;
@@ -175,16 +179,16 @@ namespace DCGO_Tweaks
 
         void ApplyDPStyle()
         {
-            _dp = new GameObjectHandle("DP", _root_object);
+            _dp_ui = new GameObjectHandle("DP", _root_object);
 
-            if (_dp.GameObject == null)
+            if (_dp_ui.GameObject == null)
             {
                 return;
             }
 
-            _dp.GameObject.transform.localPosition = Vector3.zero;
+            _dp_ui.GameObject.transform.localPosition = Vector3.zero;
 
-            _dp.ForEachChild((GameObject child) =>
+            _dp_ui.ForEachChild((GameObject child) =>
             {
                 if (child.name == "Background_black")
                 {
@@ -192,7 +196,7 @@ namespace DCGO_Tweaks
                 }
                 else if (child.name == "DPText")
                 {
-                    child.transform.localPosition = new Vector3(0, -49.0f, 0);
+                    child.transform.localPosition = new Vector3(0, -48.5f, 0);
                     child.transform.localScale = new Vector3(0.1f, 0.1f, 1.0f);
                     Outline outline = child.AddComponent<Outline>();
                     outline.effectColor = Color.black;
@@ -200,15 +204,15 @@ namespace DCGO_Tweaks
                 }
                 else
                 {
-                    Sprite sprite = AssetManager.Instance.DPHolder;
+                    Sprite sprite = AssetManager.Instance.UnitFrame;
 
                     if (child.name == "DPBackground0_mask")
                     {
-                        sprite = AssetManager.Instance.DPHolderMaskLeft;
+                        sprite = AssetManager.Instance.UnitFrameMaskRight;
                     }
                     else if (child.name == "DPBackground1_mask")
                     {
-                        sprite = AssetManager.Instance.DPHolderMaskRight;
+                        sprite = AssetManager.Instance.UnitFrameMaskLeft;
                     }
 
                     child.transform.localPosition = new Vector3(0, -48.0f, 0);
