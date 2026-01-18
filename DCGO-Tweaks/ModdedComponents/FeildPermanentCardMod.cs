@@ -25,6 +25,7 @@ namespace DCGO_Tweaks
         GameObjectHandle _dp_ui;
         GameObjectHandle _source_count_ui;
         GameObjectHandle _level_ui;
+        GameObjectHandle _linked_ui;
         TextMeshProUGUI _old_level_text;
         Text _new_level_text;
         bool _dp_last_active_state = false;
@@ -35,6 +36,7 @@ namespace DCGO_Tweaks
             _source_count_ui = new GameObjectHandle("EvoRoot", _root_object);
             _level_ui = new GameObjectHandle("Level", _root_object);
             _dp_ui = new GameObjectHandle("DP", _root_object);
+            _linked_ui = new GameObjectHandle("LinkedRoot", _root_object);
 
             if (_dp_ui.GameObject != null)
             {
@@ -55,25 +57,24 @@ namespace DCGO_Tweaks
 
         void ApplyLinkStyle()
         {
-            GameObject link_root = _root_object.Child("LinkedRoot");
-            GameObject link_icon = _root_object.Child("LinkedRoot.Link Icon");
+            GameObject link_icon = _linked_ui.Child("Link Icon");
 
-            if (link_root == null || link_icon == null)
+            if (_linked_ui.GameObject == null || link_icon == null)
             {
                 return;
             }
 
-            link_root.transform.localScale = Vector3.one;
+            _linked_ui.GameObject.transform.localScale = Vector3.one;
 
             Vector3 local_Pos_Offset = new Vector3(60f, -58f, 0.0f);
 
             if (!Settings.Instance.RotateInfoUIWithPermanent())
             {
-                link_root.transform.localPosition = Vector3.zero;
+                _linked_ui.GameObject.transform.localPosition = Vector3.zero;
             }
             else
             {
-                link_root.transform.localPosition = local_Pos_Offset;
+                _linked_ui.GameObject.transform.localPosition = local_Pos_Offset;
                 local_Pos_Offset = Vector3.zero;
             }
 
@@ -99,7 +100,7 @@ namespace DCGO_Tweaks
 
             if (!dp_offset)
             {
-                local_Pos_Offset += new Vector3(40f, -26f, 0f);
+                local_Pos_Offset += new Vector3(40f, -14.5f, 0f);
             }
 
             if (!Settings.Instance.RotateInfoUIWithPermanent())
@@ -166,7 +167,7 @@ namespace DCGO_Tweaks
 
             if (!dp_offset)
             {
-                local_Pos_Offset += new Vector3(40f, -26f, 0f);
+                local_Pos_Offset += new Vector3(-40f, -14.5f, 0f);
             }
 
             if (!Settings.Instance.RotateInfoUIWithPermanent())
@@ -317,7 +318,7 @@ namespace DCGO_Tweaks
                 return;
             }
 
-            if (_dp_ui.GameObject == null || _root_object.GameObject == null || _source_count_ui.GameObject == null || _level_ui.GameObject == null)
+            if (_dp_ui.GameObject == null || _root_object.GameObject == null || _source_count_ui.GameObject == null || _level_ui.GameObject == null || _linked_ui.GameObject == null)
             {
                 return;
             }
@@ -327,6 +328,7 @@ namespace DCGO_Tweaks
             _dp_ui.GameObject.transform.localEulerAngles = euler;
             _source_count_ui.GameObject.transform.localEulerAngles = euler;
             _level_ui.GameObject.transform.localEulerAngles = euler;
+            _linked_ui.GameObject.transform.localEulerAngles = euler;
         }
 
         void UpdateUIPosition()
