@@ -26,28 +26,6 @@ namespace DCGO_Tweaks
         }
     }
 
-    [HarmonyPatch(typeof(FieldPermanentCard), nameof(FieldPermanentCard.GetLocalCanvasPosition))]
-
-    public static class FieldPermanentCardGetLocalCanvasPositionPatch
-    {
-        private static void Prefix(FieldPermanentCard __instance, ref Vector3 __result)
-        {
-            if (__instance.ThisPermanent == null || __instance.ThisPermanent.TopCard == null)
-            {
-                return;
-            }
-
-            FrameManager frame_manager = __instance.ThisPermanent.TopCard.GetComponent<FrameManager>();
-            if (frame_manager != null)
-            {
-                frame_manager.UpdateAllRows();
-            }
-
-            __result = __instance.transform.localPosition + __instance.transform.parent.localPosition;
-        }
-    }
-
-
     [RegisterTypeInIl2Cpp]
     class FrameManager : MonoBehaviour
     {
@@ -111,11 +89,6 @@ namespace DCGO_Tweaks
 
         }
 
-        public void Update()
-        {
-            UpdateAllRows();
-        }
-
         public void UpdateAllRows()
         {
             UpdateRow(_digimon_row);
@@ -148,7 +121,8 @@ namespace DCGO_Tweaks
                     }
                     else 
                     {
-                        frame_comp.PermanentAge = ++_age_counter * (permanent.IsOption ? -1 : 1);
+                        _age_counter += 1;
+                        frame_comp.PermanentAge = _age_counter * (permanent.IsOption ? -1 : 1);
                         _frames_with_new_permanents.Add(frame_comp);
                     }
                 }
@@ -189,11 +163,6 @@ namespace DCGO_Tweaks
                             _frames_with_permanents[j] = temp;
                         }
                     }
-                }
-
-                if (_digimon_row == frame_row)
-                {
-                    MelonLogger.Msg($"Digimon {_frames_with_permanents.Count}, {_frames_with_new_permanents.Count}");
                 }
 
                 SpaceRow(spacing, _frames_with_permanents, _frames_with_new_permanents, offset);
