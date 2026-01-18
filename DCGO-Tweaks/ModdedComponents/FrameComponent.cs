@@ -19,6 +19,7 @@ namespace DCGO_Tweaks
         public FieldCardFrame CardFrame { get; set; }
 
         Permanent _last_permanent = null;
+        bool _is_default_state = true;
 
         public int PermanentAge { get; set; } = 0;
 
@@ -34,10 +35,17 @@ namespace DCGO_Tweaks
         public void ResetPosition()
         {
             MovePosition(_inital_pos.x, 0.0f , true);
+            _is_default_state = true;
         }
 
         public void Update()
         {
+            // Putting this hear just to be safe
+            if (!_is_default_state && CardFrame.GetFramePermanent() == null)
+            {
+                ResetPosition();
+            }
+
             // Whould Love to move this from update but dont know how to add OnUpdate to DOAnchorPos
             UpdateArrows();
         }
@@ -63,6 +71,7 @@ namespace DCGO_Tweaks
                 }
             }
 
+            _is_default_state = false;
             RectTransform.get_anchoredPosition_Injected(out Vector2 pos);
             pos.x = x_pos;
 
