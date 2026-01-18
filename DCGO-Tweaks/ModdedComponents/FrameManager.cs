@@ -12,7 +12,7 @@ namespace DCGO_Tweaks
 
     [HarmonyPatch(typeof(FieldCardFrame), nameof(FieldCardFrame.GetLocalCanvasPosition))]
 
-    public static class FieldCardFrameGetLocalCanvasPositionPathc
+    public static class FieldCardFrameGetLocalCanvasPositionPatch
     {
         private static void Prefix(FieldCardFrame __instance, ref Vector3 __result)
         {
@@ -89,11 +89,6 @@ namespace DCGO_Tweaks
 
         }
 
-        public void Update()
-        {
-            UpdateAllRows();
-        }
-
         public void UpdateAllRows()
         {
             UpdateRow(_digimon_row);
@@ -126,7 +121,8 @@ namespace DCGO_Tweaks
                     }
                     else 
                     {
-                        frame_comp.PermanentAge = ++_age_counter * (permanent.IsOption ? -1 : 1);
+                        _age_counter += 1;
+                        frame_comp.PermanentAge = _age_counter * (permanent.IsOption ? -1 : 1);
                         _frames_with_new_permanents.Add(frame_comp);
                     }
                 }
@@ -185,9 +181,9 @@ namespace DCGO_Tweaks
 
                     foreach (var frame in frame_list)
                     {
-                        if (frame.GetArrowPos() == arrow_rect.localPosition && !frame.ArrowRects.Contains(arrow_rect))
+                        if (frame.GetArrowPos() == arrow_rect.localPosition)
                         {
-                            frame.ArrowRects.Add(arrow_rect);
+                            frame.AddArrowRect(arrow_rect);
                             break;
                         }
                     }

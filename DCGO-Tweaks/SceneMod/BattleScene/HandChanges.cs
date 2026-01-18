@@ -65,10 +65,10 @@ namespace DCGO_Tweaks
         private static void Postfix(Draggable_HandCard __instance)
         {
             HandCardModded mod_comp = __instance.GetComponent<HandCardModded>();
-
-            if (mod_comp != null)
+            HandCard hand_comp = __instance.GetComponent<HandCard>();
+            if (mod_comp != null && hand_comp != null)
             {
-                mod_comp.IsDragging = true;
+                mod_comp.IsDragging = true && hand_comp.CanDrag;
             }
 
             HandChanges.UpdateHandPositions(you: true);

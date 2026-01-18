@@ -16,6 +16,7 @@ namespace DCGO_Tweaks
         public static bool Init()
         {
             Instance = new Settings();
+            Instance.InitColorSettings();
             Instance.InitBackgroundSettings();
             Instance.InitDeckSettings();
             Instance.InitEggDeckSettings();
@@ -28,6 +29,41 @@ namespace DCGO_Tweaks
 
             return true;
         }
+
+        #region Color Settings
+        private MelonPreferences_Category _color_category;
+        private MelonPreferences_Entry<Color32> _red_color;
+        private MelonPreferences_Entry<Color32> _blue_color;
+        private MelonPreferences_Entry<Color32> _yellow_color;
+        private MelonPreferences_Entry<Color32> _green_color;
+        private MelonPreferences_Entry<Color32> _black_color;
+        private MelonPreferences_Entry<Color32> _purple_color;
+        private MelonPreferences_Entry<Color32> _white_color;
+
+        void InitColorSettings()
+        {
+            _color_category = MelonPreferences.CreateCategory("Color");
+
+            _red_color = _color_category.CreateEntry("Red", new Color32(230, 0, 46, 255));
+            _blue_color = _color_category.CreateEntry("Blue", new Color32(0, 151, 224, 255));
+            _yellow_color = _color_category.CreateEntry("Yellow", new Color32(254, 225, 1, 255));
+            _green_color = _color_category.CreateEntry("Green", new Color32(0, 155, 107, 255));
+            _black_color = _color_category.CreateEntry("Black", new Color32(50, 50, 50, 255));
+            _purple_color = _color_category.CreateEntry("Purple", new Color32(100, 86, 163, 255));
+            _white_color = _color_category.CreateEntry("White", new Color32(220, 220, 220, 255));
+
+            _color_category.SetFilePath(ConfigPath);
+        }
+
+        public Color RedColor() => _red_color.Value;
+        public Color BlueColor() => _blue_color.Value;
+        public Color YellowColor() => _yellow_color.Value;
+        public Color GreenColor() => _green_color.Value;
+        public Color BlackColor() => _black_color.Value;
+        public Color PurpleColor() => _purple_color.Value;
+        public Color WhiteColor() => _white_color.Value;
+
+        #endregion
 
         #region Background Settings
 
@@ -51,7 +87,7 @@ namespace DCGO_Tweaks
         private MelonPreferences_Category _deck_category;
         private MelonPreferences_Entry<Vector2> _your_deck_offset;
         private MelonPreferences_Entry<Vector2> _opponent_deck_offset;
-        private MelonPreferences_Entry<Color> _deck_outline_colour;
+        private MelonPreferences_Entry<Color32> _deck_outline_colour;
         private MelonPreferences_Entry<float> _deck_outline_scale;
 
         void InitDeckSettings()
@@ -61,7 +97,7 @@ namespace DCGO_Tweaks
             _your_deck_offset = _deck_category.CreateEntry("Your_Offset", Vector2.zero);
             _opponent_deck_offset = _deck_category.CreateEntry("Opponent_Offset", Vector2.zero);
 
-            _deck_outline_colour = _deck_category.CreateEntry("Outline_Color", Color.black);
+            _deck_outline_colour = _deck_category.CreateEntry("Outline_Color", (Color32)Color.black);
             _deck_outline_scale = _deck_category.CreateEntry("Outline_Scale", 1.0f);
 
             _deck_category.SetFilePath(ConfigPath);
@@ -77,9 +113,9 @@ namespace DCGO_Tweaks
         private MelonPreferences_Category _egg_deck_category;
         private MelonPreferences_Entry<Vector2> _your_egg_deck_offset;
         private MelonPreferences_Entry<Vector2> _opponent_egg_deck_offset;
-        private MelonPreferences_Entry<Color> _egg_deck_outline_colour;
+        private MelonPreferences_Entry<Color32> _egg_deck_outline_colour;
         private MelonPreferences_Entry<float> _egg_deck_outline_scale;
-        private MelonPreferences_Entry<Color> _egg_deck_selected_outline_color;
+        private MelonPreferences_Entry<Color32> _egg_deck_selected_outline_color;
         private MelonPreferences_Entry<float> _egg_deck_selected_outline_scale;
 
         private MelonPreferences_Entry<bool> _egg_deck_frame_enabled;
@@ -92,10 +128,10 @@ namespace DCGO_Tweaks
             _your_egg_deck_offset = _egg_deck_category.CreateEntry("Your_Offset", Vector2.zero);
             _opponent_egg_deck_offset = _egg_deck_category.CreateEntry("Opponent_Offset", Vector2.zero);
 
-            _egg_deck_outline_colour = _egg_deck_category.CreateEntry("Outline_Color", Color.white);
+            _egg_deck_outline_colour = _egg_deck_category.CreateEntry("Outline_Color", (Color32)Color.white);
             _egg_deck_outline_scale = _egg_deck_category.CreateEntry("Outline_Scale", 1.0f);
 
-            _egg_deck_selected_outline_color = _egg_deck_category.CreateEntry("Selected_Outline_Color", new Color(0.9623f, 0.2678f, 0.2944f, 1.0f));
+            _egg_deck_selected_outline_color = _egg_deck_category.CreateEntry("Selected_Outline_Color", (Color32)new Color(0.9623f, 0.2678f, 0.2944f, 1.0f));
             _egg_deck_selected_outline_scale = _egg_deck_category.CreateEntry("Selected_Outline_Scale", 1.0f);
 
             _egg_deck_frame_enabled = _egg_deck_category.CreateEntry("Frame_Enabled", false);
@@ -273,7 +309,7 @@ namespace DCGO_Tweaks
 
         #region Feild Permanent Settings
         private MelonPreferences_Category _feild_permanent_settings;
-        private MelonPreferences_Entry<Color> _feild_permanent_outline_colour;
+        private MelonPreferences_Entry<Color32> _feild_permanent_outline_colour;
         private MelonPreferences_Entry<float> _feild_permanent_outline_scale;
         private MelonPreferences_Entry<float> _feild_permanent_highlight_outline_scale;
         private MelonPreferences_Entry<bool> _feild_permanent_highlight_outline_glow;
@@ -281,13 +317,14 @@ namespace DCGO_Tweaks
         private MelonPreferences_Entry<bool> _collapse_empty_space;
         private MelonPreferences_Entry<float> _feild_permanent_max_spacing;
         private MelonPreferences_Entry<float> _collapse_time;
-
+        private MelonPreferences_Entry<bool> _dcgo_tweaks_permanent_info_ui_style;
+        private MelonPreferences_Entry<bool> _rotate_info_ui_with_permanent;
 
         void InitFeildPermanentSettings()
         {
             _feild_permanent_settings = MelonPreferences.CreateCategory("Feild_Permanent");
 
-            _feild_permanent_outline_colour = _feild_permanent_settings.CreateEntry("Outline_Color", Color.black);
+            _feild_permanent_outline_colour = _feild_permanent_settings.CreateEntry("Outline_Color", (Color32)Color.black);
             _feild_permanent_outline_scale = _feild_permanent_settings.CreateEntry("Outline_Scale", 1.0f);
             _feild_permanent_highlight_outline_scale = _feild_permanent_settings.CreateEntry("Highlight_Outline_Scale", 1.0f);
             _feild_permanent_highlight_outline_glow = _feild_permanent_settings.CreateEntry("Highlight_Outline_Glow", true);
@@ -296,6 +333,9 @@ namespace DCGO_Tweaks
             _collapse_empty_space = _feild_permanent_settings.CreateEntry("Collapse_Empty_Space", true);
             _feild_permanent_max_spacing = _feild_permanent_settings.CreateEntry("Feild_Permanent_Max_Spacing", 160.0f);
             _collapse_time = _feild_permanent_settings.CreateEntry("Collapse_Time", 0.3f);
+
+            _dcgo_tweaks_permanent_info_ui_style = _feild_permanent_settings.CreateEntry("DCGO_Tweaks_Info_UI_Style", true);
+            _rotate_info_ui_with_permanent = _feild_permanent_settings.CreateEntry("Rotate_Info_UI_With_Permanent", false);
 
             _feild_permanent_settings.SetFilePath(ConfigPath);
         }
@@ -311,6 +351,9 @@ namespace DCGO_Tweaks
         public float FeildPermanentMaxSpacing() => _feild_permanent_max_spacing.Value;
 
         public float FeildCollapseTime() => _collapse_time.Value;
+
+        public bool RotateInfoUIWithPermanent() => _rotate_info_ui_with_permanent.Value;
+        public bool DCGOTweaksPermanentInfoUIStyle() => _dcgo_tweaks_permanent_info_ui_style.Value;
         #endregion
 
         #region Hand Settings
@@ -366,16 +409,19 @@ namespace DCGO_Tweaks
         #region Hand Card Settings
         private MelonPreferences_Category _hand_card_settings;
 
-        private MelonPreferences_Entry<Color> _hand_card_outline_colour;
+        private MelonPreferences_Entry<Color32> _hand_card_outline_colour;
         private MelonPreferences_Entry<float> _hand_card_outline_scale;
         private MelonPreferences_Entry<float> _hand_card_highlight_outline_scale;
+        private MelonPreferences_Entry<bool> _dcgo_tweaks_card_info_ui_style;
         void InitHandCardSettings()
         {
             _hand_card_settings = MelonPreferences.CreateCategory("Hand_Card");
 
-            _hand_card_outline_colour = _hand_card_settings.CreateEntry("Outline_Color", Color.black);
+            _hand_card_outline_colour = _hand_card_settings.CreateEntry("Outline_Color", (Color32)Color.black);
             _hand_card_outline_scale = _hand_card_settings.CreateEntry("Outline_Scale", 0.0f);
             _hand_card_highlight_outline_scale = _hand_card_settings.CreateEntry("Highlight_Outline_Scale", 1.0f);
+            _dcgo_tweaks_card_info_ui_style = _hand_card_settings.CreateEntry("DCGO_Tweaks_Info_UI_Style", true);
+
 
             _hand_card_settings.SetFilePath(ConfigPath);
         }
@@ -383,6 +429,8 @@ namespace DCGO_Tweaks
         public Color HandCardOutlineColour() => _hand_card_outline_colour.Value;
         public float HandCardOutlineScale() => _hand_card_outline_scale.Value;
         public float HandCardHighlightOutlineScale() => _hand_card_highlight_outline_scale.Value;
+
+        public bool DCGOTweaksHandInfoUIStyle() => _dcgo_tweaks_card_info_ui_style.Value;
 
         #endregion
 

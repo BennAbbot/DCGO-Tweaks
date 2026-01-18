@@ -14,6 +14,8 @@ namespace DCGO_Tweaks
         {
             Settings.Init();
             AssetManager.Instance.FindAnimatedImages();
+            AssetManager.Instance.LoadUIAssets();
+            AssetManager.Instance.InitColours();
         }
 
         public override void OnUpdate()

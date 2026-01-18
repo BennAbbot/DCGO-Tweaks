@@ -7,10 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.Tilemaps;
 
 namespace DCGO_Tweaks
 {
+    using CardColorList = Il2CppSystem.Collections.Generic.List<CardColor>;
+
     internal class AssetManager
     {
         private static AssetManager _instance;
@@ -29,8 +31,98 @@ namespace DCGO_Tweaks
 
         private AssetManager()
         {
-            InitBackgroundData();
+            LoadBackgroundData();
         }
+
+        #region UI Assets
+        DirectoryInfo _ui_directory;
+        public Sprite UnitFrame { get; private set; }
+        public Sprite UnitFrameMaskLeft { get; private set; }
+        public Sprite UnitFrameMaskRight { get; private set; }
+
+        public Sprite UnitFrameStats { get; private set; }
+
+        public Sprite CostCircle { get; private set; }
+
+        public Sprite CostCircleRotated { get; private set; }
+
+        public Sprite LinkIcon { get; private set; }
+
+        Color[] _colour_table = new Color[7];
+        public void LoadUIAssets()
+        {
+            string path = Application.dataPath;
+            _ui_directory = new DirectoryInfo(path);
+            _ui_directory = new DirectoryInfo(_ui_directory.Parent.Parent.FullName + "/Assets/UI");
+
+            UnitFrame = GetSpriteFromFile(Path.Combine(_ui_directory.FullName, "UnitFrame_Base.png"), true);
+            UnitFrameMaskLeft = GetSpriteFromFile(Path.Combine(_ui_directory.FullName, "UnitFrame_Mask_Left.png"), true);
+            UnitFrameMaskRight = GetSpriteFromFile(Path.Combine(_ui_directory.FullName, "UnitFrame_Mask_Right.png"), true);
+
+            UnitFrameStats = GetSpriteFromFile(Path.Combine(_ui_directory.FullName, "UnitFrame_Stats.png"), true);
+
+            CostCircle = GetSpriteFromFile(Path.Combine(_ui_directory.FullName, "Cost_Circle.png"), true);
+            CostCircleRotated = GetSpriteFromFile(Path.Combine(_ui_directory.FullName, "Cost_Circle_Rotated.png"), true);
+            LinkIcon = GetSpriteFromFile(Path.Combine(_ui_directory.FullName, "LinkIcon.png"), true);
+        }
+
+        public Texture2D GetTextureFromFile(string path)
+        {
+            try
+            {
+                byte[] bytes = File.ReadAllBytes(path);
+                Texture2D texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+                texture.LoadImage(bytes);
+                return texture;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public Sprite GetSpriteFromFile(string path, bool never_unload)
+        {
+            Sprite sprite = null;
+            Texture2D texture = GetTextureFromFile(path);
+            if (texture != null)
+            {
+                sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+
+                if (never_unload)
+                {
+                    texture.hideFlags = HideFlags.DontUnloadUnusedAsset;
+                    sprite.hideFlags = HideFlags.DontUnloadUnusedAsset;
+                }
+            }
+
+            return sprite;
+        }
+
+        #endregion
+
+        #region Colours
+        public void InitColours()
+        {
+            Settings settings = Settings.Instance;
+
+            DataBase.CardColor_ColorLightDictionary[CardColor.Red] = settings.RedColor();
+            DataBase.CardColor_ColorLightDictionary[CardColor.Blue] = settings.BlueColor();
+            DataBase.CardColor_ColorLightDictionary[CardColor.Yellow] = settings.YellowColor();
+            DataBase.CardColor_ColorLightDictionary[CardColor.Green] = settings.GreenColor();
+            DataBase.CardColor_ColorLightDictionary[CardColor.Black] = settings.BlackColor();
+            DataBase.CardColor_ColorLightDictionary[CardColor.Purple] = settings.PurpleColor();
+            DataBase.CardColor_ColorLightDictionary[CardColor.White] = settings.WhiteColor();
+
+            DataBase.CardColor_ColorDarkDictionary[CardColor.Red] = settings.RedColor();
+            DataBase.CardColor_ColorDarkDictionary[CardColor.Blue] = settings.BlueColor();
+            DataBase.CardColor_ColorDarkDictionary[CardColor.Yellow] = settings.YellowColor();
+            DataBase.CardColor_ColorDarkDictionary[CardColor.Green] = settings.GreenColor();
+            DataBase.CardColor_ColorDarkDictionary[CardColor.Black] = settings.BlackColor();
+            DataBase.CardColor_ColorDarkDictionary[CardColor.Purple] = settings.PurpleColor();
+            DataBase.CardColor_ColorDarkDictionary[CardColor.White] = settings.WhiteColor();
+        }
+        #endregion
 
         #region Backgrounds
         static List<int> _recent_backgrounds = new List<int>();
@@ -38,7 +130,7 @@ namespace DCGO_Tweaks
 
         DirectoryInfo _background_directory;
 
-        void InitBackgroundData()
+        void LoadBackgroundData()
         {
             string path = Application.dataPath;
             _background_directory = new DirectoryInfo(path);
