@@ -34,7 +34,8 @@ namespace DCGO_Tweaks
 
         CardSource _last_top_card = null;
 
-        AnimatedImageComp _animated_image_comp = null; 
+        RawImage _animated_image_ui = null;
+        AnimatedImage _current_animated_image = null;
 
         public void Start()
         {
@@ -367,7 +368,7 @@ namespace DCGO_Tweaks
             GameObject outline_obj = _root_object.Child("カード画像");
             Outline outline_comp = outline_obj != null ? outline_obj.GetComponent<Outline>() : null;
 
-            _animated_image_comp = outline_obj.AddComponent<AnimatedImageComp>();
+            _animated_image_ui = Utils.CreateRawImageChild(outline_obj?.GetComponent<RectTransform>(), AssetManager.Instance.CardMask);
 
             _last_top_card = _feild_permanent_card.ThisPermanent?.TopCard;
             UpdateAnimatedImage();
@@ -418,18 +419,37 @@ namespace DCGO_Tweaks
             }
         }
 
+        public void OnDestroy()
+        {
+            if (_current_animated_image != null && _animated_image_ui != null)
+            {
+                _current_animated_image.UnsubscribeRawImage(_animated_image_ui);
+            }
+        }
+
         void UpdateAnimatedImage()
         {
              CardSource top_card = _feild_permanent_card.ThisPermanent?.TopCard;
 
+            if (_current_animated_image != null)
+            {
+                _current_animated_image.UnsubscribeRawImage(_animated_image_ui);
+                _current_animated_image = null;
+            }
+
             if (top_card != null)
             {
                 string card_name = AssetManager.Instance.GetEntityFromCardIndex(top_card).CardSpriteName;
-                _animated_image_comp.AnimatedImage = AssetManager.Instance.GetAnimatedImage(card_name);
-            }
-            else
-            {
-                _animated_image_comp.AnimatedImage = null;
+                _current_animated_image = AssetManager.Instance.GetAnimatedImage(card_name);
+
+                if (_current_animated_image != null)
+                {
+                    _current_animated_image.SubscribeRawImage(_animated_image_ui);
+                }
+                else
+                {
+                    _current_animated_image = null;
+                }
             }
         }
     }

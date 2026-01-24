@@ -9,7 +9,7 @@ namespace DCGO_Tweaks
 
         const string ConfigPath = "UserData/DCGOTweaks.cfg";
 
-        private Settings() 
+        private Settings()
         {
         }
 
@@ -18,6 +18,7 @@ namespace DCGO_Tweaks
             Instance = new Settings();
             Instance.InitColorSettings();
             Instance.InitBackgroundSettings();
+            Instance.InitAnimatedCardsSettings();
             Instance.InitDeckSettings();
             Instance.InitEggDeckSettings();
             Instance.InitTrashSettings();
@@ -26,6 +27,7 @@ namespace DCGO_Tweaks
             Instance.InitHandCardSettings();
             Instance.InitHandSettings();
             Instance.InitCountInfoSettings();
+            Instance.InitDebugSettings();
 
             return true;
         }
@@ -69,7 +71,7 @@ namespace DCGO_Tweaks
 
         private MelonPreferences_Category _background_category;
         private MelonPreferences_Entry<bool> _backgrounds_enabled;
-        private MelonPreferences_Entry<int>  _background_none_repeating_list_size;
+        private MelonPreferences_Entry<int> _background_none_repeating_list_size;
         void InitBackgroundSettings()
         {
             _background_category = MelonPreferences.CreateCategory("Backgrounds");
@@ -80,6 +82,34 @@ namespace DCGO_Tweaks
 
         public bool IsBackgroundsEnabled() => _backgrounds_enabled.Value;
         public int BackgroundNoneRepeatingListSize() => _background_none_repeating_list_size.Value;
+
+        #endregion
+
+        #region Animated Cards
+        private MelonPreferences_Category _animated_cards_category;
+        private MelonPreferences_Entry<float> _animated_cards_render_scale;
+        private MelonPreferences_Entry<int> _animated_cards_max_fps;
+        private MelonPreferences_Entry<int> _animated_cards_cache_size;
+        private MelonPreferences_Entry<int> _animated_cards_loading_threads;
+
+
+        void InitAnimatedCardsSettings()
+        {
+            _animated_cards_category = MelonPreferences.CreateCategory("Animated_Cards");
+            _animated_cards_render_scale = _animated_cards_category.CreateEntry("Render_Scale", 0.75f, null, "Smaller percentages can reduce vram usage");
+            _animated_cards_max_fps = _animated_cards_category.CreateEntry("Max_Fps", 24, null, "Max FPS an Animated Image, reduce to save vram");
+            _animated_cards_cache_size = _background_category.CreateEntry("Cache_Size", 20, null, "Number of cards that stay loaded, reduce to save vram");
+            _animated_cards_loading_threads = _background_category.CreateEntry("Loading_Thread_Count", 4, null, "Number of threads that can load animated images, high numbers will load Animated Images faster but will increase CPU and Memory usage");
+
+            _animated_cards_category.SetFilePath(ConfigPath);
+        }
+
+        public float AimatedCardsRenderScale() => _animated_cards_render_scale.Value;
+        public int AnimatedCardsMaxFps() => _animated_cards_max_fps.Value;
+        public int AnimatedCardsCacheSize() => _animated_cards_cache_size.Value;
+        public int AnimatedCardsLoadingThreads() => _animated_cards_loading_threads.Value;
+
+
 
         #endregion
 
@@ -470,5 +500,22 @@ namespace DCGO_Tweaks
         public Vector2 OpponenttDeckCountOffset() => _opponent_deck_count_offset.Value;
 
         #endregion
+
+        #region Debug Settings
+        private MelonPreferences_Category _debug_settings;
+        private MelonPreferences_Entry<bool> _debug_show_fps;
+        void InitDebugSettings()
+        {
+            _debug_settings = MelonPreferences.CreateCategory("Debug");
+
+            _debug_show_fps = _debug_settings.CreateEntry("Show_FPS", false);
+
+            _debug_settings.SetFilePath(ConfigPath);
+        }
+
+        public bool ShowFps() => _debug_show_fps.Value;
+        #endregion
     }
+
+
 }

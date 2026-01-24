@@ -31,11 +31,12 @@ namespace DCGO_Tweaks
 
         HandCard _hand_card;
 
-        HandCard _hand_card = null;
-
         CardSource _last_card_source = null;
 
-        AnimatedImageComp _animated_image_comp = null;
+
+        RawImage _animated_image_ui = null;
+        AnimatedImage _current_animated_image = null;
+        Image _normal_image = null;
 
         static int s_age_counter = 0;
 
@@ -258,16 +259,16 @@ namespace DCGO_Tweaks
             });
         }
 
+        public void OnDestroy()
+        {
+            if (_current_animated_image != null && _animated_image_ui != null)
+            {
+                _current_animated_image.UnsubscribeRawImage(_animated_image_ui);
+            }
+        }
         public void ApplyOutlineChanges()
         {
             Settings settings = Settings.Instance;
-
-            Outline outline = _image_object?.GetComponent<Outline>();
-            if (outline != null)
-            {
-                outline.effectDistance = new Vector2(1.0f, 1.0f) * settings.HandCardOutlineScale();
-                outline.effectColor = settings.HandCardOutlineColour();
-            }
 
             Transform highlight_transform = _highlight_object?.GameObject != null ? _highlight_object.GameObject.transform : null;
             if (highlight_transform != null)
@@ -276,9 +277,21 @@ namespace DCGO_Tweaks
                 highlight_transform.set_localScale_Injected(ref highlight_size);
             }
 
-            _animated_image_comp = outline.gameObject.AddComponent<AnimatedImageComp>();
+            if (_image_object.GameObject != null)
+            {
+                _normal_image = _image_object.GetComponent<Image>();
 
-            UpdateAnimatedImage();
+                Outline outline = _image_object.GetComponent<Outline>();
+                if (outline != null)
+                {
+                    outline.effectDistance = new Vector2(1.0f, 1.0f) * settings.HandCardOutlineScale();
+                    outline.effectColor = settings.HandCardOutlineColour();
+                }
+
+                _animated_image_ui = Utils.CreateRawImageChild(_image_object?.GetComponent<RectTransform>(), AssetManager.Instance.CardMask);
+
+                UpdateAnimatedImage();
+            }
 
             _last_is_flipped = IsFlipped();
             _last_card_source = _hand_card.cardSource;
@@ -289,8 +302,10 @@ namespace DCGO_Tweaks
             return _hand_card.CardImage == ContinuousController.instance.ReverseCard;
         }
 
-        void LateUpdate()
+        void Update()
         {
+            _normal_image.enabled = !_animated_image_ui.enabled;
+
             if (_last_is_flipped != IsFlipped())
             {
                 _last_is_flipped = IsFlipped();
@@ -307,17 +322,26 @@ namespace DCGO_Tweaks
 
         void UpdateAnimatedImage()
         {
+            if (_current_animated_image != null)
+            {
+                _current_animated_image.UnsubscribeRawImage(_animated_image_ui);
+                _current_animated_image = null;
+            }
+
             if (!IsFlipped() && _hand_card.cardSource != null )
             {
                 string card_name = AssetManager.Instance.GetEntityFromCardIndex(_hand_card.cardSource).CardSpriteName;
-                _animated_image_comp.AnimatedImage = AssetManager.Instance.GetAnimatedImage(card_name);
-            }
-            else
-            {
-                _animated_image_comp.AnimatedImage = null;
+                _current_animated_image = AssetManager.Instance.GetAnimatedImage(card_name);
+
+                if (_current_animated_image != null)
+                {
+                    _current_animated_image.SubscribeRawImage(_animated_image_ui);
+                }
+                else
+                {
+                    _current_animated_image = null;
+                }
             }
         }
-
-
     }
 }

@@ -34,7 +34,7 @@ namespace DCGO_Tweaks
 
         public GameObjectHandle(string path, GameObject parent)
         {
-            _gameObject = FindObject("Parent", parent);
+            _gameObject = FindObject(path, parent);
         }
 
         public GameObjectHandle(GameObject gameObject)
