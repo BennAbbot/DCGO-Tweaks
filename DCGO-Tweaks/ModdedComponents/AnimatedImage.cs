@@ -4,6 +4,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 using static Il2CppSystem.Threading.Volatile;
 
 namespace DCGO_Tweaks
@@ -100,14 +101,8 @@ namespace DCGO_Tweaks
         {
             if (!_new_frame_added.IsSet)
             {
-                lock (_new_frame_pixels_lock)
-                {
-                    if (_new_frame_pixels != null)
-                    {
-                        AddFrame(_width, _height, _new_frame_pixels);
-                        _new_frame_added.Set();
-                    }
-                }
+                AddFrameFromCurrentPixels();
+                _new_frame_added.Set();
             }
 
             if (_frames.Count == 0 || _subscribers.Count == 0)
@@ -175,13 +170,43 @@ namespace DCGO_Tweaks
             }
         }
 
-        public Task LoadAsync()
+        public void LoadAsync()
         {
+
+            // Making this a local function to stop IL2CppInterop Warnings
+            void FillCurrentTexturePixels(ImageFrame<Rgba32> image_frame, int width, int height)
+            {
+                lock (_new_frame_pixels_lock)
+                {
+                    if (_new_frame_pixels == null || _new_frame_pixels.Length != width * height)
+                    {
+                        return;
+                    }
+
+                    image_frame.ProcessPixelRows(accessor =>
+                    {
+                        for (int y = 0; y < height; y++)
+                        {
+                            var row = accessor.GetRowSpan(y);
+                            int unity_y = height - 1 - y;
+
+                            for (int x = 0; x < width; x++)
+                            {
+                                Rgba32 pixel = row[x];
+                                _new_frame_pixels[unity_y * width + x] = new Color32(
+                                    pixel.R, pixel.G, pixel.B, pixel.A
+                                );
+                            }
+                        }
+                    });
+                }
+            }
+
             //MelonLogger.Msg($"Loading: {FilePath}");
 
             if (_is_loading || _is_loaded)
             {
-                return null;
+                return;
             }
 
             _is_loading = true;
@@ -189,7 +214,7 @@ namespace DCGO_Tweaks
             _load_cancellation = new CancellationTokenSource();
             CancellationToken token = _load_cancellation.Token;
 
-            return Task.Run(() =>
+            Task.Run(() =>
             {
                 try
                 {
@@ -290,55 +315,33 @@ namespace DCGO_Tweaks
                     System.GC.Collect();
                 }
             }, token);
-        }
+        }        
 
-        void FillCurrentTexturePixels(ImageFrame<Rgba32> image_frame, int width, int height)
+        public void AddFrameFromCurrentPixels()
         {
             lock (_new_frame_pixels_lock)
             {
-                if (_new_frame_pixels == null || _new_frame_pixels.Length != width * height)
+                if (_new_frame_pixels != null)
                 {
-                    return;
-                }
+                    Texture2D texture = new Texture2D(_width, _height, TextureFormat.RGB24, true);
+                    texture.hideFlags = HideFlags.DontUnloadUnusedAsset;
+                    texture.filterMode = FilterMode.Bilinear;
 
-                image_frame.ProcessPixelRows(accessor =>
-                {
-                    for (int y = 0; y < height; y++)
+                    texture.SetPixels32(_new_frame_pixels);
+                    texture.Apply(true, true);
+
+                    if (_frames.Count == 0)
                     {
-                        var row = accessor.GetRowSpan(y);
-                        int unity_y = height - 1 - y;
-
-                        for (int x = 0; x < width; x++)
+                        foreach (var item in _subscribers)
                         {
-                            Rgba32 pixel = row[x];
-                            _new_frame_pixels[unity_y * width + x] = new Color32(
-                                pixel.R, pixel.G, pixel.B, pixel.A
-                            );
+                            item.enabled = true;
+                            item.texture = texture;
                         }
                     }
-                });
-            }
-        }
 
-        public void AddFrame(int width, int height, Color32[] pixels)
-        {
-            Texture2D texture = new Texture2D(width, height, TextureFormat.RGB24, true);
-            texture.hideFlags = HideFlags.DontUnloadUnusedAsset;
-            texture.filterMode = FilterMode.Bilinear;
-
-            texture.SetPixels32(pixels);
-            texture.Apply(true, true);
-
-            if (_frames.Count == 0)
-            {
-                foreach (var item in _subscribers)
-                {
-                    item.enabled = true;
-                    item.texture = texture;
+                    _frames.Add(texture);
                 }
             }
-
-            _frames.Add(texture);
         }
     }
 }

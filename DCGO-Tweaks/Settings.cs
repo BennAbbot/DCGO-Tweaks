@@ -93,8 +93,12 @@ namespace DCGO_Tweaks
         private MelonPreferences_Entry<int> _animated_cards_loading_threads;
         private MelonPreferences_Entry<bool> _animate_field_card;
         private MelonPreferences_Entry<bool> _animate_hand_card;
-        private MelonPreferences_Entry<bool> _animate_permanent_details;
         private MelonPreferences_Entry<bool> _animate_card_close_up;
+        private MelonPreferences_Entry<bool> _animate_permanent_details;
+        private MelonPreferences_Entry<bool> _animate_deck_editor;
+        private MelonPreferences_Entry<bool> _animate_deck_editor_details;
+
+
 
 
         void InitAnimatedCardsSettings()
@@ -106,8 +110,11 @@ namespace DCGO_Tweaks
             _animated_cards_loading_threads = _animated_cards_category.CreateEntry("Loading_Thread_Count", 4, null, "Number of threads that can load animated images, high numbers will load Animated Images faster but will increase CPU and Memory usage");
             _animate_field_card = _animated_cards_category.CreateEntry("Animate_Field_Card", true);
             _animate_hand_card = _animated_cards_category.CreateEntry("Animate_Hand_Card", true);
-            _animate_permanent_details = _animated_cards_category.CreateEntry("Animate_Permanent_Details", false);
             _animate_card_close_up = _animated_cards_category.CreateEntry("Animate_Card_Close_Up", false);
+            _animate_permanent_details = _animated_cards_category.CreateEntry("Animate_Permanent_Details", false);
+            _animate_deck_editor = _animated_cards_category.CreateEntry("Animate_Deck_Editor_Cards", true);
+            _animate_deck_editor_details = _animated_cards_category.CreateEntry("vAnimate_Deck_Editor_Details", false);
+
 
             _animated_cards_category.SetFilePath(ConfigPath);
         }
@@ -121,6 +128,9 @@ namespace DCGO_Tweaks
         public bool AnimateHandCard() => _animate_hand_card.Value;
         public bool AnimatePermanentDetails() => _animate_permanent_details.Value;
         public bool AnimateCardCloseUp() => _animate_card_close_up.Value;
+        public bool AnimatedDeckEditorCards() => _animate_deck_editor.Value;
+
+        public bool AnimatedDeckEditorDetails() => _animate_deck_editor_details.Value;
         #endregion
 
         #region Deck Settings
