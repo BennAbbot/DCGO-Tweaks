@@ -68,6 +68,7 @@ namespace DCGO_Tweaks
             {
                 image_mask_obj.AddComponent<Image>().sprite = mask_sprite;
                 image_mask_obj.AddComponent<Mask>().showMaskGraphic = false;
+                image_mask_obj.AddComponent<CanvasGroup>().blocksRaycasts = false;
             }
 
             RawImage raw_image = image_obj.AddComponent<RawImage>();

@@ -91,6 +91,10 @@ namespace DCGO_Tweaks
         private MelonPreferences_Entry<int> _animated_cards_max_fps;
         private MelonPreferences_Entry<int> _animated_cards_cache_size;
         private MelonPreferences_Entry<int> _animated_cards_loading_threads;
+        private MelonPreferences_Entry<bool> _animate_field_card;
+        private MelonPreferences_Entry<bool> _animate_hand_card;
+        private MelonPreferences_Entry<bool> _animate_permanent_details;
+        private MelonPreferences_Entry<bool> _animate_card_close_up;
 
 
         void InitAnimatedCardsSettings()
@@ -98,8 +102,12 @@ namespace DCGO_Tweaks
             _animated_cards_category = MelonPreferences.CreateCategory("Animated_Cards");
             _animated_cards_render_scale = _animated_cards_category.CreateEntry("Render_Scale", 0.75f, null, "Smaller percentages can reduce vram usage");
             _animated_cards_max_fps = _animated_cards_category.CreateEntry("Max_Fps", 24, null, "Max FPS an Animated Image, reduce to save vram");
-            _animated_cards_cache_size = _background_category.CreateEntry("Cache_Size", 20, null, "Number of cards that stay loaded, reduce to save vram");
-            _animated_cards_loading_threads = _background_category.CreateEntry("Loading_Thread_Count", 4, null, "Number of threads that can load animated images, high numbers will load Animated Images faster but will increase CPU and Memory usage");
+            _animated_cards_cache_size = _animated_cards_category.CreateEntry("Cache_Size", 20, null, "Number of cards that stay loaded, reduce to save vram");
+            _animated_cards_loading_threads = _animated_cards_category.CreateEntry("Loading_Thread_Count", 4, null, "Number of threads that can load animated images, high numbers will load Animated Images faster but will increase CPU and Memory usage");
+            _animate_field_card = _animated_cards_category.CreateEntry("Animate_Field_Card", true);
+            _animate_hand_card = _animated_cards_category.CreateEntry("Animate_Hand_Card", true);
+            _animate_permanent_details = _animated_cards_category.CreateEntry("Animate_Permanent_Details", false);
+            _animate_card_close_up = _animated_cards_category.CreateEntry("Animate_Card_Close_Up", false);
 
             _animated_cards_category.SetFilePath(ConfigPath);
         }
@@ -109,8 +117,10 @@ namespace DCGO_Tweaks
         public int AnimatedCardsCacheSize() => _animated_cards_cache_size.Value;
         public int AnimatedCardsLoadingThreads() => _animated_cards_loading_threads.Value;
 
-
-
+        public bool AnimateFieldCard() => _animate_field_card.Value;
+        public bool AnimateHandCard() => _animate_hand_card.Value;
+        public bool AnimatePermanentDetails() => _animate_permanent_details.Value;
+        public bool AnimateCardCloseUp() => _animate_card_close_up.Value;
         #endregion
 
         #region Deck Settings

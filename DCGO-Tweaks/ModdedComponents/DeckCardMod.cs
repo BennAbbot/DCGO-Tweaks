@@ -12,14 +12,14 @@ namespace DCGO_Tweaks
     {
         private static void Postfix(CardPrefab_CreateDeck __instance)
         {
-            __instance.gameObject.AddComponent<DeckCardModded>();
+            __instance.gameObject.AddComponent<DeckCardMod>();
         }
     }
 
     [RegisterTypeInIl2Cpp]
-    class DeckCardModded : MonoBehaviour
+    class DeckCardMod : MonoBehaviour
     {
-        public DeckCardModded(IntPtr ptr) : base(ptr) { }
+        public DeckCardMod(IntPtr ptr) : base(ptr) { }
 
         GameObjectHandle _image_object;
 
@@ -29,18 +29,6 @@ namespace DCGO_Tweaks
 
         RawImage _animated_image_ui = null;
         AnimatedImage _current_animated_image = null;
-
-        static int s_age_counter = 0;
-
-        public int Age { get; private set; }
-
-        public bool IsDragging { get; set; }
-        bool _last_is_flipped = false;
-
-        public void Awake()
-        {
-            Age = s_age_counter++;
-        }
 
         public void Start()
         {

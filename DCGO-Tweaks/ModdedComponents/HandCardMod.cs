@@ -31,7 +31,7 @@ namespace DCGO_Tweaks
 
         HandCard _hand_card;
 
-        CardSource _last_card_source = null;
+        Sprite _last_card_sprite = null;
 
 
         RawImage _animated_image_ui = null;
@@ -74,7 +74,23 @@ namespace DCGO_Tweaks
                 ApplyDPStyle();
             }
 
+            _animated_image_ui = Utils.CreateRawImageChild(_image_object?.GetComponent<RectTransform>(), AssetManager.Instance.CardMask);
+
+            _last_is_flipped = IsFlipped();
+            _last_card_sprite = _hand_card.CardImage.sprite;
+
+            UpdateAnimatedImage();
+
             ApplyOutlineChanges();
+        }
+
+        public void OnDisable()
+        {
+            if (_current_animated_image != null && gameObject.name != "DetailHandCard")
+            {
+                _current_animated_image.UnsubscribeRawImage(_animated_image_ui);
+                _current_animated_image = null;
+            }
         }
 
         public void ApplyCostStyle()
@@ -287,25 +303,16 @@ namespace DCGO_Tweaks
                     outline.effectDistance = new Vector2(1.0f, 1.0f) * settings.HandCardOutlineScale();
                     outline.effectColor = settings.HandCardOutlineColour();
                 }
-
-                _animated_image_ui = Utils.CreateRawImageChild(_image_object?.GetComponent<RectTransform>(), AssetManager.Instance.CardMask);
-
-                UpdateAnimatedImage();
-            }
-
-            _last_is_flipped = IsFlipped();
-            _last_card_source = _hand_card.cardSource;
+            } 
         }
 
         bool IsFlipped()
         {
-            return _hand_card.CardImage == ContinuousController.instance.ReverseCard;
+            return _hand_card.CardImage.sprite == ContinuousController.instance.ReverseCard;
         }
 
-        void Update()
+        void LateUpdate()
         {
-            _normal_image.enabled = !_animated_image_ui.enabled;
-
             if (_last_is_flipped != IsFlipped())
             {
                 _last_is_flipped = IsFlipped();
@@ -313,22 +320,27 @@ namespace DCGO_Tweaks
                 UpdateAnimatedImage();
             }
 
-            if (_last_card_source != _hand_card.cardSource)
+            if (_last_card_sprite != _hand_card.CardImage.sprite)
             {
-                _last_card_source = _hand_card.cardSource;
+                _last_card_sprite = _hand_card.CardImage.sprite;
                 UpdateAnimatedImage();
             }
         }
 
         void UpdateAnimatedImage()
         {
+            if (!CanAnimated())
+            {
+                return;
+            }
+
             if (_current_animated_image != null)
             {
                 _current_animated_image.UnsubscribeRawImage(_animated_image_ui);
                 _current_animated_image = null;
             }
 
-            if (!IsFlipped() && _hand_card.cardSource != null )
+            if (!IsFlipped() && _hand_card.cardSource != null && gameObject.active)
             {
                 string card_name = AssetManager.Instance.GetEntityFromCardIndex(_hand_card.cardSource).CardSpriteName;
                 _current_animated_image = AssetManager.Instance.GetAnimatedImage(card_name);
@@ -342,6 +354,19 @@ namespace DCGO_Tweaks
                     _current_animated_image = null;
                 }
             }
+        }
+
+        bool CanAnimated()
+        {
+            Settings settings = Settings.Instance;
+
+            if (gameObject.name == "DetailHandCard")
+            {
+                return settings.AnimateCardCloseUp();
+            }
+
+            return settings.AnimateHandCard();
+
         }
     }
 }
