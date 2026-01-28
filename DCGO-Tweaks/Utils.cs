@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace DCGO_Tweaks
 {
@@ -41,6 +42,39 @@ namespace DCGO_Tweaks
             {
                 rect_trans.set_localScale_Injected(ref scale);
             }
+        }
+
+        public static RawImage CreateRawImageChild(RectTransform image_root, Sprite mask_sprite = null)
+        {
+            if (image_root == null)
+            {
+                return null;
+            }
+
+            GameObject image_obj = new GameObject("RawImage");
+            GameObject image_mask_obj = new GameObject("Mask");
+
+            RectTransform image_mask_rect = image_mask_obj.AddComponent<RectTransform>();
+            RectTransform image_rect = image_obj.AddComponent<RectTransform>();
+
+            image_mask_obj.transform.SetParent(image_root.transform, false);
+            image_obj.transform.SetParent(image_mask_obj.transform, false);
+
+            Vector2 size_delta = image_root.sizeDelta;
+            image_mask_rect.sizeDelta = size_delta;
+            image_rect.sizeDelta = size_delta;
+
+            if (mask_sprite != null)
+            {
+                image_mask_obj.AddComponent<Image>().sprite = mask_sprite;
+                image_mask_obj.AddComponent<Mask>().showMaskGraphic = false;
+                image_mask_obj.AddComponent<CanvasGroup>().blocksRaycasts = false;
+            }
+
+            RawImage raw_image = image_obj.AddComponent<RawImage>();
+            raw_image.enabled = false;
+
+            return raw_image;
         }
     }
 }

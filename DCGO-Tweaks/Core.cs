@@ -1,4 +1,5 @@
 ﻿using MelonLoader;
+using UnityEngine;
 
 [assembly: MelonInfo(typeof(DCGO_Tweaks.Core), "DCGO Tweaks", "1.0.0", "Lv.B", null)]
 [assembly: MelonGame("DCGO", "DCGO")]
@@ -12,8 +13,19 @@ namespace DCGO_Tweaks
         public override void OnInitializeMelon()
         {
             Settings.Init();
+        }
+
+        public override void OnLateInitializeMelon()
+        {
+            AssetManager.Instance.FindAnimatedImages();
             AssetManager.Instance.LoadUIAssets();
             AssetManager.Instance.InitColours();
+
+            if (Settings.Instance.ShowFps())
+            {
+                GameObject fpsObject = new GameObject("FPSCounter");
+                fpsObject.AddComponent<FPSCounter>();
+            }
         }
 
         public override void OnUpdate()
@@ -26,7 +38,10 @@ namespace DCGO_Tweaks
 
         public override void OnSceneWasLoaded(int build_index, string scene_name)
         {
-            AssetManager.Instance.LoadSceneSprites();
+            AssetManager asset_manager = AssetManager.Instance;
+
+            asset_manager.LoadSceneSprites();
+            asset_manager.CleanUpAnimatedImages(true);
 
             switch (scene_name)
             {

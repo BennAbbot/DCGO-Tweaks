@@ -339,9 +339,14 @@
   </PropertyGroup>
 
 	<ItemGroup>
+		<Compile Include="ModdedComponents\AnimatedImage.cs" />
 		<Compile Include="AssetManager.cs" />
+		<Compile Include="ModdedComponents\DeckDetailsMod.cs" />
+		<Compile Include="ModdedComponents\PermanentDetailsMod.cs" />
+		<Compile Include="ModdedComponents\FPSCounter.cs" />
 		<Compile Include="ModdedComponents\FrameComponent.cs" />
 		<Compile Include="ModdedComponents\FrameManager.cs" />
+		<Compile Include="ModdedComponents\DeckCardMod.cs" />
 		<Compile Include="ModdedComponents\HandCardMod.cs" />
 		<Compile Include="ObjectCollection\BattleSceneCollection.cs" />
 		<Compile Include="SceneMod\BattleScene\BackgroundChanges.cs" />

@@ -1,18 +1,9 @@
-﻿using Harmony;
-using Il2Cpp;
+﻿using Il2Cpp;
 using Il2CppInterop.Runtime;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 namespace DCGO_Tweaks
 {
-    using CardColorList = Il2CppSystem.Collections.Generic.List<CardColor>;
-
     internal class AssetManager
     {
         private static AssetManager _instance;
@@ -48,12 +39,14 @@ namespace DCGO_Tweaks
 
         public Sprite LinkIcon { get; private set; }
 
-        Color[] _colour_table = new Color[7];
+        public Sprite CardMask { get; private set; }
+        public Shader AnimatedImageShader { get; private set; }
+
         public void LoadUIAssets()
         {
             string path = Application.dataPath;
             _ui_directory = new DirectoryInfo(path);
-            _ui_directory = new DirectoryInfo(_ui_directory.Parent.Parent.FullName + "/Assets/UI");
+            _ui_directory = new DirectoryInfo(_ui_directory.Parent.Parent.FullName + "/Assets/Textures/UI");
 
             UnitFrame = GetSpriteFromFile(Path.Combine(_ui_directory.FullName, "UnitFrame_Base.png"), true);
             UnitFrameMaskLeft = GetSpriteFromFile(Path.Combine(_ui_directory.FullName, "UnitFrame_Mask_Left.png"), true);
@@ -64,6 +57,7 @@ namespace DCGO_Tweaks
             CostCircle = GetSpriteFromFile(Path.Combine(_ui_directory.FullName, "Cost_Circle.png"), true);
             CostCircleRotated = GetSpriteFromFile(Path.Combine(_ui_directory.FullName, "Cost_Circle_Rotated.png"), true);
             LinkIcon = GetSpriteFromFile(Path.Combine(_ui_directory.FullName, "LinkIcon.png"), true);
+            CardMask = GetSpriteFromFile(Path.Combine(_ui_directory.FullName, "CardMask.png"), true);
         }
 
         public Texture2D GetTextureFromFile(string path)
@@ -197,7 +191,6 @@ namespace DCGO_Tweaks
             Texture2D tex = new Texture2D(1920, 1080);
             tex.LoadImage(bytes);
 
-
             return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100.0f);
         }
         #endregion
@@ -228,6 +221,141 @@ namespace DCGO_Tweaks
             }
 
             return _sprites[name];
+        }
+        #endregion
+
+        #region Animated Images
+
+
+        struct AnimatedImageEntry
+        {
+            public AnimatedImage Image;
+            public float LastAccessTime;
+        }
+
+        private Dictionary<string, AnimatedImageEntry> _animated_image_look_up = new Dictionary<string, AnimatedImageEntry>();
+
+        DirectoryInfo _animated_cards_directory;
+        DirectoryInfo _animated_ui_directory;
+        GameObject _animated_image_holder;
+
+        public void FindAnimatedImages()
+        {
+            Settings settings = Settings.Instance;
+
+            _animated_image_holder = new GameObject();
+            GameObject.DontDestroyOnLoad(_animated_image_holder);
+
+            string path = Application.dataPath;
+            _animated_cards_directory = new DirectoryInfo(path);
+            _animated_ui_directory = new DirectoryInfo(_animated_cards_directory.Parent.Parent.FullName + "/Assets/Textures/UI/Animated");
+            _animated_cards_directory = new DirectoryInfo(_animated_cards_directory.Parent.Parent.FullName + "/Assets/Textures/Card/Animated");
+
+            AnimatedImage.SetLoadLimit(settings.AnimatedCardsLoadingThreads());
+
+            foreach (var file in _animated_cards_directory.GetFiles())
+            {
+                if (file.Extension == ".webp" || file.Extension == ".gif")
+                {
+                    string key = System.IO.Path.GetFileNameWithoutExtension(file.Name);
+                    if (!_animated_image_look_up.ContainsKey(key))
+                    {
+                        AnimatedImage image = _animated_image_holder.AddComponent<AnimatedImage>();
+
+                        int width = (int)(430 * settings.AimatedCardsRenderScale());
+                        int height = (int)(600 * settings.AimatedCardsRenderScale());
+
+                        image.Init(file.FullName, true, settings.AnimatedCardsMaxFps(), width, height);
+                        _animated_image_look_up.Add(key, new AnimatedImageEntry() { Image = image, LastAccessTime = 0.0f});
+                    }
+                }
+            }
+        }
+
+        public void CleanUpAnimatedImages(bool inculde_in_use = true)
+        {
+            foreach (var item in _animated_image_look_up)
+            {
+                if ((item.Value.Image.IsLoaded() || item.Value.Image.IsLoading()) && ShouldUnloadAnimtedImage(item.Value.Image, inculde_in_use))
+                {
+                    item.Value.Image.Unload();
+                }
+            }
+        }
+
+        public bool ShouldUnloadAnimtedImage(AnimatedImage image, bool inculde_in_use = true)
+        {
+            if ((!inculde_in_use && image.InUse()) || !image.IsCard)
+            {
+                return false;
+            }
+
+            List<AnimatedImageEntry> list = _animated_image_look_up.Values.ToList();
+
+            // Annoying, cant use .Sort so do it myself
+            for (int i = 0; i < list.Count - 1; i++)
+            {
+                for (int j = i + 1; j < list.Count; j++)
+                {
+                    if (list[i].LastAccessTime < list[j].LastAccessTime)
+                    {
+                        AnimatedImageEntry temp = list[i];
+                        list[i] = list[j];
+                        list[j] = temp;
+                    }
+                }
+            }
+
+            int target = Settings.Instance.AnimatedCardsCacheSize();
+
+            for (int i = list.Count - 1; i >= target; i--)
+            {
+                if (list[i].Image == image)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool HasAnimatedImage(string image_name)
+        {
+            return _animated_image_look_up.ContainsKey(image_name);
+        }
+
+        public CEntity_Base GetEntityFromCardIndex(CardSource card_source)
+        {
+            if (card_source == null)
+            {
+                return null;
+            }
+
+            // TODO: Find a better way to do this, getCardEntityByCardID looks slow but the index doesnt match any of the internal lists
+            return ContinuousController.instance.getCardEntityByCardID(card_source.CardEntityIndex);
+        }
+
+        public AnimatedImage GetAnimatedImage(string image_name, bool load = true)
+        {
+            if (!HasAnimatedImage(image_name))
+            {
+                return null;
+            }
+
+            AnimatedImageEntry _animated_image = _animated_image_look_up[image_name];
+
+            _animated_image.LastAccessTime = Time.time;
+
+            if (!_animated_image.Image.IsLoading() && !_animated_image.Image.IsLoaded())
+            {
+                _animated_image.Image.LoadAsync();
+            }
+
+            _animated_image_look_up[image_name] = _animated_image;
+
+            CleanUpAnimatedImages(false);
+
+            return _animated_image.Image;
         }
         #endregion
     }

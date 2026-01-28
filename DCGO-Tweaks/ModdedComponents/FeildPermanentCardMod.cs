@@ -26,9 +26,18 @@ namespace DCGO_Tweaks
         GameObjectHandle _source_count_ui;
         GameObjectHandle _level_ui;
         GameObjectHandle _linked_ui;
+        GameObjectHandle _image_ui;
         TextMeshProUGUI _old_level_text;
+       
         Text _new_level_text;
         bool _dp_last_active_state = false;
+
+        FieldPermanentCard _feild_permanent_card = null;
+
+        CardSource _last_top_card = null;
+
+        RawImage _animated_image_ui = null;
+        AnimatedImage _current_animated_image = null;
 
         public void Start()
         {
@@ -37,6 +46,7 @@ namespace DCGO_Tweaks
             _level_ui = new GameObjectHandle("Level", _root_object);
             _dp_ui = new GameObjectHandle("DP", _root_object);
             _linked_ui = new GameObjectHandle("LinkedRoot", _root_object);
+            _image_ui = new GameObjectHandle("カード画像", _root_object);
 
             if (_dp_ui.GameObject != null)
             {
@@ -51,6 +61,13 @@ namespace DCGO_Tweaks
                 ApplySourceCountStyle(_dp_last_active_state);
                 ApplyTappedStyle();
             }
+
+            _animated_image_ui = Utils.CreateRawImageChild(_image_ui?.GetComponent<RectTransform>(), AssetManager.Instance.CardMask);
+
+            _feild_permanent_card = GetComponent<FieldPermanentCard>();
+
+            _last_top_card = _feild_permanent_card.ThisPermanent?.TopCard;
+            UpdateAnimatedImage();
 
             ApplyOutlineAndShadowChanges();
         }
@@ -356,8 +373,8 @@ namespace DCGO_Tweaks
         {
             Settings settings = Settings.Instance;
 
-            GameObject outline_obj = _root_object.Child("カード画像");
-            Outline outline_comp = outline_obj != null ? outline_obj.GetComponent<Outline>() : null;
+
+            Outline outline_comp = _image_ui?.GetComponent<Outline>();
 
             if (outline_comp)
             {
@@ -366,7 +383,7 @@ namespace DCGO_Tweaks
 
                 if (Settings.Instance.FeildPermanentShadow())
                 {
-                    Shadow Shadow = outline_obj.AddComponent<Shadow>();
+                    Shadow Shadow = _image_ui.GameObject.AddComponent<Shadow>();
                     Shadow.effectColor = new Color(0.0f, 0.0f, 0.0f, 0.1f);
                     Shadow.effectDistance = new Vector2(-7.0f, -7.0f);
                 }
@@ -393,8 +410,60 @@ namespace DCGO_Tweaks
 
             if (_new_level_text != null && _old_level_text != null)
             {
-                _new_level_text.text =  "Lv." + _old_level_text.text;
+                _new_level_text.text = "Lv." + _old_level_text.text;
             }
+
+            CardSource top_card = _feild_permanent_card.ThisPermanent?.TopCard;
+            if (top_card != _last_top_card)
+            {
+                _last_top_card = top_card;
+
+                UpdateAnimatedImage();
+            }
+        }
+
+        public void OnDestroy()
+        {
+            if (_current_animated_image != null && _animated_image_ui != null)
+            {
+                _current_animated_image.UnsubscribeRawImage(_animated_image_ui);
+            }
+        }
+
+        void UpdateAnimatedImage()
+        {
+            if (!CanAnimated())
+            {
+                return;
+            }
+
+             CardSource top_card = _feild_permanent_card.ThisPermanent?.TopCard;
+
+            if (_current_animated_image != null)
+            {
+                _current_animated_image.UnsubscribeRawImage(_animated_image_ui);
+                _current_animated_image = null;
+            }
+
+            if (top_card != null)
+            {
+                string card_name = AssetManager.Instance.GetEntityFromCardIndex(top_card).CardSpriteName;
+                _current_animated_image = AssetManager.Instance.GetAnimatedImage(card_name);
+
+                if (_current_animated_image != null)
+                {
+                    _current_animated_image.SubscribeRawImage(_animated_image_ui);
+                }
+                else
+                {
+                    _current_animated_image = null;
+                }
+            }
+        }
+
+        bool CanAnimated()
+        {
+            return Settings.Instance.AnimateFieldCard();
         }
     }
 }
