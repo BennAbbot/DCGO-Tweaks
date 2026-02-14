@@ -342,6 +342,7 @@
 		<Compile Include="ModdedComponents\AnimatedImage.cs" />
 		<Compile Include="AssetManager.cs" />
 		<Compile Include="ModdedComponents\DeckDetailsMod.cs" />
+		<Compile Include="ModdedComponents\ArrowManager.cs" />
 		<Compile Include="ModdedComponents\PermanentDetailsMod.cs" />
 		<Compile Include="ModdedComponents\FPSCounter.cs" />
 		<Compile Include="ModdedComponents\FrameComponent.cs" />

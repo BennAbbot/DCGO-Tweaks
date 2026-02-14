@@ -20,7 +20,7 @@ namespace DCGO_Tweaks
             DontDestroyOnLoad(gameObject);
 
             style.alignment = TextAnchor.UpperLeft;
-            style.fontSize = 24;
+            style.fontSize = 8;
             style.normal.textColor = Color.green;
         }
 

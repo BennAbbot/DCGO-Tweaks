@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using Il2Cpp;
-using Il2CppDCGO.CardEntities;
 using MelonLoader;
 using UnityEngine;
 using UnityEngine.UI;

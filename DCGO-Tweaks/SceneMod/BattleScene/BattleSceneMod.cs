@@ -26,6 +26,8 @@ namespace DCGO_Tweaks
 
             FrameManager.InitForPlayer(GManager.instance.You, sort_dir: 1);
             FrameManager.InitForPlayer(GManager.instance.Opponent, sort_dir: - 1);
+
+            ArrowManager.AddToManager(GManager.instance);
         }
 
         public void SceneUpdate()

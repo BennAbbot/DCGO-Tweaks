@@ -1,13 +1,11 @@
 ﻿using HarmonyLib;
 using Il2Cpp;
+using Il2CppSystem;
 using MelonLoader;
 using UnityEngine;
-using UnityEngine.Playables;
-using UnityEngine.UI;
 
 namespace DCGO_Tweaks
 {
-    using static Il2CppSystem.Uri;
     using FrameComponentList = Il2CppSystem.Collections.Generic.List<FrameComponent>;
 
     [HarmonyPatch(typeof(FieldCardFrame), nameof(FieldCardFrame.GetLocalCanvasPosition))]
@@ -29,12 +27,13 @@ namespace DCGO_Tweaks
     [RegisterTypeInIl2Cpp]
     class FrameManager : MonoBehaviour
     {
-        public FrameManager(IntPtr ptr) : base(ptr) { }
+        public FrameManager(System.IntPtr ptr) : base(ptr) { }
 
         Player _player;
 
         FrameComponentList _digimon_row = new FrameComponentList();
         FrameComponentList _tamer_row = new FrameComponentList();
+        public FrameComponentList Frames { get; private set; } = new FrameComponentList();
 
         FrameComponentList _frames_with_new_permanents = new FrameComponentList();
         FrameComponentList _frames_with_permanents = new FrameComponentList();
@@ -74,6 +73,8 @@ namespace DCGO_Tweaks
                 {
                     continue;
                 }
+
+                frame_manager.Frames.Add(frame_comp);
 
                 if (index < 9)
                 {
@@ -133,12 +134,10 @@ namespace DCGO_Tweaks
                 }
             }
 
-            AsignArrows(_frames_with_permanents);
-
             if (do_spacing)
             {
                 float total_space = _min_permanent_spacing * frame_row.Count;
-                float spacing = Math.Min(_max_permanent_spacing, total_space / _frames_with_permanents.Count);
+                float spacing = System.Math.Min(_max_permanent_spacing, total_space / _frames_with_permanents.Count);
 
                 float offset = 0.0f;
 
@@ -171,28 +170,6 @@ namespace DCGO_Tweaks
                 }
 
                 SpaceRow(spacing, _frames_with_permanents, _frames_with_new_permanents, offset);
-            }
-
-            void AsignArrows(FrameComponentList frame_list)
-            {
-                Transform arrow_parent = GManager.instance.targetArrowParent;
-                for (int i = 0; i < arrow_parent.childCount; i++)
-                {
-                    RectTransform arrow_rect = arrow_parent.GetChild(i).GetComponent<RectTransform>();
-                    if (arrow_rect == null)
-                    {
-                        continue;
-                    }
-
-                    foreach (var frame in frame_list)
-                    {
-                        if (frame.GetArrowPos() == arrow_rect.localPosition)
-                        {
-                            frame.AddArrowRect(arrow_rect);
-                            break;
-                        }
-                    }
-                }
             }
 
             void SpaceRow(float spacing, FrameComponentList frames_with_permanents, FrameComponentList frames_with_new_permanents, float centre_offset)
