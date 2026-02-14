@@ -1,9 +1,7 @@
 ﻿using Il2Cpp;
 using Il2CppDG.Tweening;
 using MelonLoader;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace DCGO_Tweaks
 {
@@ -40,11 +38,7 @@ namespace DCGO_Tweaks
 
         public void Update()
         {
-            // Putting this hear just to be safe
-            if (!_is_default_state && CardFrame.GetFramePermanent() == null)
-            {
-                ResetPosition();
-            }
+            //CardFrame.Frame.gameObject.GetComponent<Image>().color = _is_default_state ? Color.clear : Color.black;
 
             // Whould Love to move this from update but dont know how to add OnUpdate to DOAnchorPos
             UpdateArrows();
@@ -61,6 +55,7 @@ namespace DCGO_Tweaks
                     permanent_pos.x = x_pos;
                     if (time > 0.0f)
                     {
+                        permanent_transfrom.DOKill(true);
                         permanent_transfrom.DOAnchorPos(permanent_pos, time).SetEase(Ease.OutQuint);
                     }
                     else
@@ -75,14 +70,7 @@ namespace DCGO_Tweaks
             RectTransform.get_anchoredPosition_Injected(out Vector2 pos);
             pos.x = x_pos;
 
-            if (time > 0.0f)
-            {
-                RectTransform.DOAnchorPos(pos, time).SetEase(Ease.OutQuint);
-            }
-            else
-            {
-                RectTransform.set_anchoredPosition_Injected(ref pos);
-            }
+            RectTransform.set_anchoredPosition_Injected(ref pos);
 
             UpdateArrows();
         }

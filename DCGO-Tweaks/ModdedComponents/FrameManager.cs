@@ -89,6 +89,11 @@ namespace DCGO_Tweaks
 
         }
 
+        public void LateUpdate()
+        {
+            UpdateAllRows();
+        }
+
         public void UpdateAllRows()
         {
             UpdateRow(_digimon_row);
