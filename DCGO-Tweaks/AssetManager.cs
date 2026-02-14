@@ -324,9 +324,14 @@ namespace DCGO_Tweaks
             return _animated_image_look_up.ContainsKey(image_name);
         }
 
-        public CEntity_Base GetEntityFromCardIndex(CardSource card_source)
+        public CEntity_Base GetEntityFromSource(CardSource card_source)
         {
             if (card_source == null)
+            {
+                return null;
+            }
+
+            if (card_source.IsToken)
             {
                 return null;
             }

@@ -341,8 +341,12 @@ namespace DCGO_Tweaks
 
             if (!IsFlipped() && _hand_card.cardSource != null && gameObject.active)
             {
-                string card_name = AssetManager.Instance.GetEntityFromCardIndex(_hand_card.cardSource).CardSpriteName;
-                _current_animated_image = AssetManager.Instance.GetAnimatedImage(card_name);
+                CEntity_Base Entity = AssetManager.Instance.GetEntityFromSource(_hand_card.cardSource);
+                _current_animated_image = null;
+                if (Entity)
+                {
+                    _current_animated_image = AssetManager.Instance.GetAnimatedImage(Entity.CardSpriteName);
+                }
 
                 if (_current_animated_image != null)
                 {

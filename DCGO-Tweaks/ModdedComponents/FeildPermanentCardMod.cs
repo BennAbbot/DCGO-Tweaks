@@ -447,8 +447,12 @@ namespace DCGO_Tweaks
 
             if (top_card != null)
             {
-                string card_name = AssetManager.Instance.GetEntityFromCardIndex(top_card).CardSpriteName;
-                _current_animated_image = AssetManager.Instance.GetAnimatedImage(card_name);
+                CEntity_Base Entity = AssetManager.Instance.GetEntityFromSource(top_card);
+                _current_animated_image = null;
+                if (Entity)
+                {
+                    _current_animated_image = AssetManager.Instance.GetAnimatedImage(Entity.CardSpriteName);
+                }
 
                 if (_current_animated_image != null)
                 {
