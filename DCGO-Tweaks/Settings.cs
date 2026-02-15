@@ -113,7 +113,7 @@ namespace DCGO_Tweaks
             _animate_card_close_up = _animated_cards_category.CreateEntry("Animate_Card_Close_Up", false);
             _animate_permanent_details = _animated_cards_category.CreateEntry("Animate_Permanent_Details", false);
             _animate_deck_editor = _animated_cards_category.CreateEntry("Animate_Deck_Editor_Cards", true);
-            _animate_deck_editor_details = _animated_cards_category.CreateEntry("vAnimate_Deck_Editor_Details", false);
+            _animate_deck_editor_details = _animated_cards_category.CreateEntry("Animate_Deck_Editor_Details", false);
 
 
             _animated_cards_category.SetFilePath(ConfigPath);
