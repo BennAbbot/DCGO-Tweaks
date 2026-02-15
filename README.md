@@ -2,6 +2,8 @@
 
 DCGO Tweaks is a visual overhaul mod for DCGO.
 
+![Showcase](Images/Showcase.gif)
+
 - [Installation](#-installation)
 - [Features](#-features)
 - [Building From Source](#-building-from-source)
