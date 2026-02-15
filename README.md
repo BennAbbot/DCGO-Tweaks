@@ -4,10 +4,6 @@ DCGO Tweaks is a visual overhaul mod for DCGO.
 
 ![Showcase](Images/Showcase.gif)
 
-- [Installation](#-installation)
-- [Features](#-features)
-- [Building From Source](#-building-from-source)
-
 ---
 
 ## Installation
@@ -43,13 +39,14 @@ Settings can be changed in `UserData/DCGOTweaks.cfg`
 ## Building From Source
 
 ### Requirements
+- Visual Studio 2026
 - Some version of Unity
 - A modded version of DCGO
 - NuGet package: ImageSharp
 
 ### Steps
 1. Clone repository
-2. Open project
+2. Open project in VS
 3. Right-click the solution
 4. Manage NuGet Packages
 5. Search for `SixLabors.ImageSharp`
