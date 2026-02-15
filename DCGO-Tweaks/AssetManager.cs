@@ -40,7 +40,7 @@ namespace DCGO_Tweaks
         public Sprite LinkIcon { get; private set; }
 
         public Sprite CardMask { get; private set; }
-        public Shader AnimatedImageShader { get; private set; }
+        public Sprite CardGlowCutoff { get; private set; }
 
         public void LoadUIAssets()
         {
@@ -58,6 +58,8 @@ namespace DCGO_Tweaks
             CostCircleRotated = GetSpriteFromFile(Path.Combine(_ui_directory.FullName, "Cost_Circle_Rotated.png"), true);
             LinkIcon = GetSpriteFromFile(Path.Combine(_ui_directory.FullName, "LinkIcon.png"), true);
             CardMask = GetSpriteFromFile(Path.Combine(_ui_directory.FullName, "CardMask.png"), true);
+
+            CardGlowCutoff = GetSpriteFromFile(Path.Combine(_ui_directory.FullName, "Glow_Cutoff.png"), true);
         }
 
         public Texture2D GetTextureFromFile(string path)

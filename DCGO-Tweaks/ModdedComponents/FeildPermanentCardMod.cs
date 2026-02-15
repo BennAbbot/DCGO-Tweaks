@@ -27,6 +27,7 @@ namespace DCGO_Tweaks
         GameObjectHandle _level_ui;
         GameObjectHandle _linked_ui;
         GameObjectHandle _image_ui;
+        Image _glow_outline;
         TextMeshProUGUI _old_level_text;
        
         Text _new_level_text;
@@ -39,6 +40,8 @@ namespace DCGO_Tweaks
         RawImage _animated_image_ui = null;
         AnimatedImage _current_animated_image = null;
 
+        Sprite _original_glow_outline;
+
         public void Start()
         {
             _root_object = new GameObjectHandle("Parent", gameObject);
@@ -47,6 +50,18 @@ namespace DCGO_Tweaks
             _dp_ui = new GameObjectHandle("DP", _root_object);
             _linked_ui = new GameObjectHandle("LinkedRoot", _root_object);
             _image_ui = new GameObjectHandle("カード画像", _root_object);
+
+
+            GameObject glow_outline_obj = _root_object.Child("Outline_Select");
+            if (glow_outline_obj)
+            {
+                _glow_outline = glow_outline_obj.GetComponent<Image>();
+                if (_glow_outline)
+                {
+                    _original_glow_outline = _glow_outline.sprite;
+                }
+                
+            }
 
             if (_dp_ui.GameObject != null)
             {
@@ -60,6 +75,8 @@ namespace DCGO_Tweaks
                 ApplyDPStyle();
                 ApplySourceCountStyle(_dp_last_active_state);
                 ApplyTappedStyle();
+
+                ApplyOutlineGlowStyle(_dp_last_active_state);
             }
 
             _animated_image_ui = Utils.CreateRawImageChild(_image_ui?.GetComponent<RectTransform>(), AssetManager.Instance.CardMask);
@@ -252,6 +269,14 @@ namespace DCGO_Tweaks
            
         }
 
+        void ApplyOutlineGlowStyle(bool dp_showing)
+        {
+            if (_glow_outline)
+            {
+                _glow_outline.sprite = dp_showing ? AssetManager.Instance.CardGlowCutoff : _original_glow_outline;
+            }
+        }
+
         void ApplyDPStyle()
         {
             if (_dp_ui.GameObject == null)
@@ -364,6 +389,8 @@ namespace DCGO_Tweaks
             {
                 ApplyLevelStyle(_dp_ui.GameObject.activeSelf);
                 ApplySourceCountStyle(_dp_ui.GameObject.activeSelf);
+
+                ApplyOutlineGlowStyle(_dp_ui.GameObject.activeSelf);
 
                 _dp_last_active_state = _dp_ui.GameObject.activeSelf;
             }
