@@ -27,11 +27,13 @@ namespace DCGO_Tweaks
         GameObjectHandle _level_ui;
         GameObjectHandle _linked_ui;
         GameObjectHandle _image_ui;
+        GameObjectHandle _tapped_ui;
         Image _glow_outline;
         TextMeshProUGUI _old_level_text;
        
         Text _new_level_text;
         bool _dp_last_active_state = false;
+        bool _last_tap_state = false;
 
         FieldPermanentCard _feild_permanent_card = null;
 
@@ -50,22 +52,31 @@ namespace DCGO_Tweaks
             _dp_ui = new GameObjectHandle("DP", _root_object);
             _linked_ui = new GameObjectHandle("LinkedRoot", _root_object);
             _image_ui = new GameObjectHandle("カード画像", _root_object);
-
+            _tapped_ui = new GameObjectHandle("TapObject", _root_object);
 
             GameObject glow_outline_obj = _root_object.Child("Outline_Select");
             if (glow_outline_obj)
             {
                 _glow_outline = glow_outline_obj.GetComponent<Image>();
-                if (_glow_outline)
+
+                if (Settings.Instance.FeildPermanentHighlightOutlineGlow())
+                {
+                    _original_glow_outline = AssetManager.Instance.GetSceneSprite("カード角丸マスク_glow");
+                }
+                else
                 {
                     _original_glow_outline = _glow_outline.sprite;
                 }
-                
             }
 
             if (_dp_ui.GameObject != null)
             {
                 _dp_last_active_state = _dp_ui.GameObject.activeSelf;
+            }
+
+            if (_tapped_ui.GameObject != null)
+            {
+                _last_tap_state = _tapped_ui.GameObject.activeSelf;
             }
 
             if (Settings.Instance.DCGOTweaksPermanentInfoUIStyle())
@@ -75,8 +86,6 @@ namespace DCGO_Tweaks
                 ApplyDPStyle();
                 ApplySourceCountStyle(_dp_last_active_state);
                 ApplyTappedStyle();
-
-                ApplyOutlineGlowStyle(_dp_last_active_state);
             }
 
             _animated_image_ui = Utils.CreateRawImageChild(_image_ui?.GetComponent<RectTransform>(), AssetManager.Instance.CardMask);
@@ -87,6 +96,7 @@ namespace DCGO_Tweaks
             UpdateAnimatedImage();
 
             ApplyOutlineAndShadowChanges();
+            ApplyOutlineGlowStyle(_dp_last_active_state && !_last_tap_state);
         }
 
         void ApplyLinkStyle()
@@ -271,9 +281,14 @@ namespace DCGO_Tweaks
 
         void ApplyOutlineGlowStyle(bool dp_showing)
         {
+            Settings settings = Settings.Instance;
+
             if (_glow_outline)
             {
-                _glow_outline.sprite = dp_showing ? AssetManager.Instance.CardGlowCutoff : _original_glow_outline;
+                Vector3 OutlineSize = new Vector3(1.15f, 1.1f, 1.0f) * settings.FeildPermanentHighlightOutlineScale();
+                _glow_outline.transform.set_localScale_Injected(ref OutlineSize);
+
+                _glow_outline.sprite = dp_showing && settings.DCGOTweaksPermanentInfoUIStyle() ? AssetManager.Instance.CardGlowCutoff : _original_glow_outline;
             }
         }
 
@@ -390,16 +405,22 @@ namespace DCGO_Tweaks
                 ApplyLevelStyle(_dp_ui.GameObject.activeSelf);
                 ApplySourceCountStyle(_dp_ui.GameObject.activeSelf);
 
-                ApplyOutlineGlowStyle(_dp_ui.GameObject.activeSelf);
+                ApplyOutlineGlowStyle(_dp_ui.GameObject.activeSelf && !_tapped_ui.GameObject.activeSelf);
 
                 _dp_last_active_state = _dp_ui.GameObject.activeSelf;
+            }
+
+            if (_last_tap_state != _tapped_ui.GameObject.activeSelf)
+            {
+                ApplyOutlineGlowStyle(_dp_ui.GameObject.activeSelf && !_tapped_ui.GameObject.activeSelf);
+
+                _last_tap_state = _tapped_ui.GameObject.activeSelf;
             }
         }
 
         void ApplyOutlineAndShadowChanges()
         {
             Settings settings = Settings.Instance;
-
 
             Outline outline_comp = _image_ui?.GetComponent<Outline>();
 
@@ -413,19 +434,6 @@ namespace DCGO_Tweaks
                     Shadow Shadow = _image_ui.GameObject.AddComponent<Shadow>();
                     Shadow.effectColor = new Color(0.0f, 0.0f, 0.0f, 0.1f);
                     Shadow.effectDistance = new Vector2(-7.0f, -7.0f);
-                }
-            }
-
-            GameObject highlight_outline_obj = _root_object.Child("Outline_Select");
-            Image highlight_image = highlight_outline_obj != null ? highlight_outline_obj.GetComponent<Image>() : null;
-            if (highlight_image)
-            {
-                Vector3 OutlineSize = new Vector3(1.15f, 1.1f, 1.0f) * settings.FeildPermanentHighlightOutlineScale();
-                highlight_outline_obj.transform.set_localScale_Injected(ref OutlineSize);
-
-                if (settings.FeildPermanentHighlightOutlineGlow())
-                {
-                    highlight_image.sprite = AssetManager.Instance.GetSceneSprite("カード角丸マスク_glow");
                 }
             }
         }
