@@ -24,7 +24,7 @@ Settings can be changed in `UserData/DCGOTweaks.cfg`
 ## Features
 - **Updated UI** — Updated UI assets and layout to make the game look nicer and support more customizability.
   
-- **Background Overhaul** — Replaced the game board and background with a single image. At the beginning of a match a random background from `Assets\Textures\Backgrounds` will be selected.
+- **Background Overhaul** — Replaced the game board and background with a single image. At the beginning of a match a random background from `Assets\Textures\Backgrounds` will be selected. *Currenty only supports 16:9 aspect ratio, Other aspect ratios will be misaligned*  
   
 - **Zone Info Hiding / Showing** — Deck/Trash/Hand counts are hidden by default. Hold `MMB` or `Left Alt` to toggle there visibility. Each stat's default visibility can be set in `UserData/DCGOTweaks.cfg`
   
