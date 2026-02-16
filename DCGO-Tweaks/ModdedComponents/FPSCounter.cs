@@ -20,7 +20,7 @@ namespace DCGO_Tweaks
             DontDestroyOnLoad(gameObject);
 
             style.alignment = TextAnchor.UpperLeft;
-            style.fontSize = 8;
+            style.fontSize = 12;
             style.normal.textColor = Color.green;
         }
 
@@ -32,8 +32,7 @@ namespace DCGO_Tweaks
         void OnGUI()
         {
             float fps = 1.0f / deltaTime;
-            float ms = deltaTime * 1000.0f;
-            string text = string.Format("{0:0.} FPS ({1:0.0} ms)", fps, ms);
+            string text = string.Format("{0:0.} FPS", fps);
 
             // Change color based on FPS
             if (fps < 30)
@@ -43,7 +42,7 @@ namespace DCGO_Tweaks
             else
                 style.normal.textColor = Color.green;
 
-            GUI.Label(new Rect(10, 10, 200, 30), text, style);
+            GUI.Label(new Rect(5, 5, 200, 30), text, style);
         }
     }
 }

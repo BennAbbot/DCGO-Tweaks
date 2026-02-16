@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using Il2Cpp;
+using Il2CppDCGO.CardEntities;
 using MelonLoader;
 using UnityEngine;
 
@@ -34,6 +35,9 @@ namespace DCGO_Tweaks
             public Vector3 _last_source_pos;
             public Vector3 _last_target_pos;
 
+            bool _vaild_source_permanent = false;
+            bool _vaild_target_permanent = false;
+
             public ManagedTargetArrow(TargetArrow arrow_obj, Vector3 inital_source_pos, Vector3 inital_target_pos, FrameComponent source_frame, FrameComponent target_frame)
             {
                 ArrowObj = arrow_obj;
@@ -43,6 +47,16 @@ namespace DCGO_Tweaks
                 TargetFrame = target_frame;
                 _last_source_pos = inital_source_pos;
                 _last_target_pos = inital_target_pos;
+
+                if (source_frame != null)
+                {
+                    _vaild_source_permanent = source_frame.CardFrame.GetFramePermanent() != null;
+                }
+
+                if (target_frame != null)
+                {
+                    _vaild_target_permanent = target_frame.CardFrame.GetFramePermanent() != null;
+                }
             }
 
             public void UpdatePosition()
@@ -53,7 +67,15 @@ namespace DCGO_Tweaks
                 if (_last_source_pos != source_pos || _last_target_pos != target_pos)
                 {
                     ArrowObj.SetTargetArrow(source_pos, target_pos);
-                }                
+
+                    bool HideArrow = _vaild_source_permanent && SourceFrame != null && SourceFrame.CardFrame.GetFramePermanent() == null;
+                    HideArrow = HideArrow || (_vaild_target_permanent && TargetFrame != null && TargetFrame.CardFrame.GetFramePermanent() == null);
+
+                    if (HideArrow)
+                    {
+                        ArrowObj.gameObject.SetActive(false);
+                    }
+                }
             }
 
         }
@@ -97,7 +119,7 @@ namespace DCGO_Tweaks
         {
             foreach (FrameComponent frame in _you_frame_manager.Frames)
             {
-                if (frame.CardFrame.framePermanent != null && frame.GetArrowPos() == pos)
+                if (frame.CardFrame.framePermanent != null && Vector3.Distance(frame.GetArrowPos(), pos) < 0.1f)
                 {
                     return frame;
                 }
@@ -105,7 +127,7 @@ namespace DCGO_Tweaks
 
             foreach (FrameComponent frame in _opponent_frame_manager.Frames)
             {
-                if (frame.CardFrame.framePermanent != null && frame.GetArrowPos() == pos)
+                if (frame.CardFrame.framePermanent != null && Vector3.Distance(frame.GetArrowPos(), pos) < 0.1f)
                 {
                     return frame;
                 }

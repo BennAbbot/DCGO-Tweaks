@@ -15,7 +15,7 @@ namespace DCGO_Tweaks
 
         public FieldCardFrame CardFrame { get; set; }
 
-        Permanent _last_permanent = null;
+        bool _last_permanent_vaild_state = false;
         bool _is_default_state = true;
 
         public int PermanentAge { get; set; } = 0;
@@ -48,10 +48,9 @@ namespace DCGO_Tweaks
                         permanent_transfrom.DOAnchorPos(permanent_pos, time).SetEase(Ease.OutQuint);
                     }
                     else
-                    {
+                    { 
                         permanent_transfrom.set_anchoredPosition_Injected(ref permanent_pos);
                     }
-                   
                 }
             }
 
@@ -64,9 +63,10 @@ namespace DCGO_Tweaks
 
         public bool IsPermanentDirty()
         {
-            if (_last_permanent != CardFrame.GetFramePermanent())
+            bool has_vaild_permanent = CardFrame.GetFramePermanent() != null;
+            if (_last_permanent_vaild_state != has_vaild_permanent)
             {
-                _last_permanent = CardFrame.GetFramePermanent();
+                _last_permanent_vaild_state = has_vaild_permanent;
                 return true;
             }
 
