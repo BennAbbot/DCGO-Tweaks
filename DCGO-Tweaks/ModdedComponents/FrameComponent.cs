@@ -39,11 +39,12 @@ namespace DCGO_Tweaks
                 RectTransform permanent_transfrom = CardFrame.GetFramePermanent().ShowingPermanentCard.gameObject.GetComponent<RectTransform>();
                 if (permanent_transfrom)
                 {
+                    permanent_transfrom.DOKill(true);
+
                     permanent_transfrom.get_anchoredPosition_Injected(out Vector2 permanent_pos);
                     permanent_pos.x = x_pos;
                     if (time > 0.0f)
                     {
-                        permanent_transfrom.DOKill(true);
                         permanent_transfrom.DOAnchorPos(permanent_pos, time).SetEase(Ease.OutQuint);
                     }
                     else

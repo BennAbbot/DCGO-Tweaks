@@ -12,14 +12,14 @@ namespace DCGO_Tweaks
     {
         private static void Postfix(FieldPermanentCard __instance)
         {
-           __instance.gameObject.AddComponent<FeildPermanentCardModded>();
+           __instance.gameObject.AddComponent<FieldPermanentCardModded>();
         }
     }
 
     [RegisterTypeInIl2Cpp]
-    class FeildPermanentCardModded : MonoBehaviour
+    class FieldPermanentCardModded : MonoBehaviour
     {
-        public FeildPermanentCardModded(IntPtr ptr) : base(ptr) { }
+        public FieldPermanentCardModded(IntPtr ptr) : base(ptr) { }
 
         GameObjectHandle _root_object;
         GameObjectHandle _dp_ui;
@@ -35,7 +35,7 @@ namespace DCGO_Tweaks
         bool _dp_last_active_state = false;
         bool _last_tap_state = false;
 
-        FieldPermanentCard _feild_permanent_card = null;
+        FieldPermanentCard _field_permanent_card = null;
 
         CardSource _last_top_card = null;
 
@@ -59,7 +59,7 @@ namespace DCGO_Tweaks
             {
                 _glow_outline = glow_outline_obj.GetComponent<Image>();
 
-                if (Settings.Instance.FeildPermanentHighlightOutlineGlow())
+                if (Settings.Instance.FieldPermanentHighlightOutlineGlow())
                 {
                     _original_glow_outline = AssetManager.Instance.GetSceneSprite("カード角丸マスク_glow");
                 }
@@ -90,9 +90,9 @@ namespace DCGO_Tweaks
 
             _animated_image_ui = Utils.CreateRawImageChild(_image_ui?.GetComponent<RectTransform>(), AssetManager.Instance.CardMask);
 
-            _feild_permanent_card = GetComponent<FieldPermanentCard>();
+            _field_permanent_card = GetComponent<FieldPermanentCard>();
 
-            _last_top_card = _feild_permanent_card.ThisPermanent?.TopCard;
+            _last_top_card = _field_permanent_card.ThisPermanent?.TopCard;
             UpdateAnimatedImage();
 
             ApplyOutlineAndShadowChanges();
@@ -285,7 +285,7 @@ namespace DCGO_Tweaks
 
             if (_glow_outline)
             {
-                Vector3 OutlineSize = new Vector3(1.15f, 1.1f, 1.0f) * settings.FeildPermanentHighlightOutlineScale();
+                Vector3 OutlineSize = new Vector3(1.15f, 1.1f, 1.0f) * settings.FieldPermanentHighlightOutlineScale();
                 _glow_outline.transform.set_localScale_Injected(ref OutlineSize);
 
                 _glow_outline.sprite = dp_showing && settings.DCGOTweaksPermanentInfoUIStyle() ? AssetManager.Instance.CardGlowCutoff : _original_glow_outline;
@@ -426,10 +426,10 @@ namespace DCGO_Tweaks
 
             if (outline_comp)
             {
-                outline_comp.effectColor = settings.FeildPermanentOutlineColour();
-                outline_comp.effectDistance = new Vector2(1.0f, 1.0f) * settings.FeildPermanentOutlineScale();
+                outline_comp.effectColor = settings.FieldPermanentOutlineColour();
+                outline_comp.effectDistance = new Vector2(1.0f, 1.0f) * settings.FieldPermanentOutlineScale();
 
-                if (Settings.Instance.FeildPermanentShadow())
+                if (Settings.Instance.FieldPermanentShadow())
                 {
                     Shadow Shadow = _image_ui.GameObject.AddComponent<Shadow>();
                     Shadow.effectColor = new Color(0.0f, 0.0f, 0.0f, 0.1f);
@@ -448,7 +448,7 @@ namespace DCGO_Tweaks
                 _new_level_text.text = "Lv." + _old_level_text.text;
             }
 
-            CardSource top_card = _feild_permanent_card.ThisPermanent?.TopCard;
+            CardSource top_card = _field_permanent_card.ThisPermanent?.TopCard;
             if (top_card != _last_top_card)
             {
                 _last_top_card = top_card;
@@ -472,7 +472,7 @@ namespace DCGO_Tweaks
                 return;
             }
 
-             CardSource top_card = _feild_permanent_card.ThisPermanent?.TopCard;
+             CardSource top_card = _field_permanent_card.ThisPermanent?.TopCard;
 
             if (_current_animated_image != null)
             {

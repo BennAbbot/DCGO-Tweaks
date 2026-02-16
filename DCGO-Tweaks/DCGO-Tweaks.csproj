@@ -359,7 +359,7 @@
 		<Compile Include="SceneMod\BattleScene\TrashChanges.cs" />
 		<Compile Include="Core.cs" />
 		<Compile Include="ObjectCollection\GameObjectHandle.cs" />
-		<Compile Include="ModdedComponents\FeildPermanentCardMod.cs" />
+		<Compile Include="ModdedComponents\FieldPermanentCardMod.cs" />
 		<Compile Include="ObjectCollection\PlayerCollection.cs" />
 		<Compile Include="SceneMod\BattleScene\BattleSceneMod.cs" />
 		<Compile Include="SceneMod\SceneMod.cs" />

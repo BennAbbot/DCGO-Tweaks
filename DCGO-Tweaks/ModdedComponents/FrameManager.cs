@@ -60,7 +60,7 @@ namespace DCGO_Tweaks
 
             frame_manager._sort_dir = sort_dir;
 
-            frame_manager._max_permanent_spacing = settings.FeildPermanentMaxSpacing();
+            frame_manager._max_permanent_spacing = settings.FieldPermanentMaxSpacing();
 
             int index = 0;
             foreach (var card_frame in frame_manager._player.fieldCardFrames)
@@ -137,7 +137,7 @@ namespace DCGO_Tweaks
             if (do_spacing)
             {
                 float total_space = _min_permanent_spacing * frame_row.Count;
-                float spacing = System.Math.Min(_max_permanent_spacing, total_space / _frames_with_permanents.Count);
+                float spacing = System.Math.Min(_max_permanent_spacing, _frames_with_permanents.Count == 0 ? 0 : total_space / _frames_with_permanents.Count);
 
                 float offset = 0.0f;
 
@@ -178,7 +178,7 @@ namespace DCGO_Tweaks
                 foreach (var frame_comp in frames_with_permanents)
                 {
                     bool is_new = frames_with_new_permanents.Contains(frame_comp);
-                    frame_comp.MovePosition((index * spacing) - ((frames_with_permanents.Count - 1) * spacing * 0.5f) + centre_offset, is_new ? 0.0f : Settings.Instance.FeildCollapseTime(), !is_new);
+                    frame_comp.MovePosition((index * spacing) - ((frames_with_permanents.Count - 1) * spacing * 0.5f) + centre_offset, is_new ? 0.0f : Settings.Instance.FieldCollapseTime(), !is_new);
                     index++;
                 }
             }

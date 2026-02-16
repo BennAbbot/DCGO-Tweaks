@@ -23,7 +23,7 @@ namespace DCGO_Tweaks
             Instance.InitEggDeckSettings();
             Instance.InitTrashSettings();
             Instance.InitBattleUISettings();
-            Instance.InitFeildPermanentSettings();
+            Instance.InitFieldPermanentSettings();
             Instance.InitHandCardSettings();
             Instance.InitHandSettings();
             Instance.InitCountInfoSettings();
@@ -357,50 +357,50 @@ namespace DCGO_Tweaks
         public bool OpponentSecurityFlipY() => _opponent_security_flip_y.Value;
         #endregion
 
-        #region Feild Permanent Settings
-        private MelonPreferences_Category _feild_permanent_settings;
-        private MelonPreferences_Entry<Color32> _feild_permanent_outline_colour;
-        private MelonPreferences_Entry<float> _feild_permanent_outline_scale;
-        private MelonPreferences_Entry<float> _feild_permanent_highlight_outline_scale;
-        private MelonPreferences_Entry<bool> _feild_permanent_highlight_outline_glow;
-        private MelonPreferences_Entry<bool> _feild_permanent_shadow;
+        #region Field Permanent Settings
+        private MelonPreferences_Category _field_permanent_settings;
+        private MelonPreferences_Entry<Color32> _field_permanent_outline_colour;
+        private MelonPreferences_Entry<float> _field_permanent_outline_scale;
+        private MelonPreferences_Entry<float> _field_permanent_highlight_outline_scale;
+        private MelonPreferences_Entry<bool> _field_permanent_highlight_outline_glow;
+        private MelonPreferences_Entry<bool> _field_permanent_shadow;
         private MelonPreferences_Entry<bool> _collapse_empty_space;
-        private MelonPreferences_Entry<float> _feild_permanent_max_spacing;
+        private MelonPreferences_Entry<float> _field_permanent_max_spacing;
         private MelonPreferences_Entry<float> _collapse_time;
         private MelonPreferences_Entry<bool> _dcgo_tweaks_permanent_info_ui_style;
         private MelonPreferences_Entry<bool> _rotate_info_ui_with_permanent;
 
-        void InitFeildPermanentSettings()
+        void InitFieldPermanentSettings()
         {
-            _feild_permanent_settings = MelonPreferences.CreateCategory("Feild_Permanent");
+            _field_permanent_settings = MelonPreferences.CreateCategory("Field_Permanent");
 
-            _feild_permanent_outline_colour = _feild_permanent_settings.CreateEntry("Outline_Color", (Color32)Color.black);
-            _feild_permanent_outline_scale = _feild_permanent_settings.CreateEntry("Outline_Scale", 1.0f);
-            _feild_permanent_highlight_outline_scale = _feild_permanent_settings.CreateEntry("Highlight_Outline_Scale", 1.0f);
-            _feild_permanent_highlight_outline_glow = _feild_permanent_settings.CreateEntry("Highlight_Outline_Glow", true);
-            _feild_permanent_shadow = _feild_permanent_settings.CreateEntry("Shadow", true);
+            _field_permanent_outline_colour = _field_permanent_settings.CreateEntry("Outline_Color", (Color32)Color.black);
+            _field_permanent_outline_scale = _field_permanent_settings.CreateEntry("Outline_Scale", 1.0f);
+            _field_permanent_highlight_outline_scale = _field_permanent_settings.CreateEntry("Highlight_Outline_Scale", 1.0f);
+            _field_permanent_highlight_outline_glow = _field_permanent_settings.CreateEntry("Highlight_Outline_Glow", true);
+            _field_permanent_shadow = _field_permanent_settings.CreateEntry("Shadow", true);
 
-            _collapse_empty_space = _feild_permanent_settings.CreateEntry("Collapse_Empty_Space", true);
-            _feild_permanent_max_spacing = _feild_permanent_settings.CreateEntry("Feild_Permanent_Max_Spacing", 160.0f);
-            _collapse_time = _feild_permanent_settings.CreateEntry("Collapse_Time", 0.3f);
+            _collapse_empty_space = _field_permanent_settings.CreateEntry("Collapse_Empty_Space", true);
+            _field_permanent_max_spacing = _field_permanent_settings.CreateEntry("Field_Permanent_Max_Spacing", 160.0f);
+            _collapse_time = _field_permanent_settings.CreateEntry("Collapse_Time", 0.3f);
 
-            _dcgo_tweaks_permanent_info_ui_style = _feild_permanent_settings.CreateEntry("DCGO_Tweaks_Info_UI_Style", true);
-            _rotate_info_ui_with_permanent = _feild_permanent_settings.CreateEntry("Rotate_Info_UI_With_Permanent", false);
+            _dcgo_tweaks_permanent_info_ui_style = _field_permanent_settings.CreateEntry("DCGO_Tweaks_Info_UI_Style", true);
+            _rotate_info_ui_with_permanent = _field_permanent_settings.CreateEntry("Rotate_Info_UI_With_Permanent", false);
 
-            _feild_permanent_settings.SetFilePath(ConfigPath);
+            _field_permanent_settings.SetFilePath(ConfigPath);
         }
 
-        public Color FeildPermanentOutlineColour() => _feild_permanent_outline_colour.Value;
-        public float FeildPermanentOutlineScale() => _feild_permanent_outline_scale.Value;
-        public float FeildPermanentHighlightOutlineScale() => _feild_permanent_highlight_outline_scale.Value;
-        public bool FeildPermanentHighlightOutlineGlow() => _feild_permanent_highlight_outline_glow.Value;
-        public bool FeildPermanentShadow() => _feild_permanent_shadow.Value;
+        public Color FieldPermanentOutlineColour() => _field_permanent_outline_colour.Value;
+        public float FieldPermanentOutlineScale() => _field_permanent_outline_scale.Value;
+        public float FieldPermanentHighlightOutlineScale() => _field_permanent_highlight_outline_scale.Value;
+        public bool FieldPermanentHighlightOutlineGlow() => _field_permanent_highlight_outline_glow.Value;
+        public bool FieldPermanentShadow() => _field_permanent_shadow.Value;
 
         public bool CollapseEmptySpace() => _collapse_empty_space.Value;
 
-        public float FeildPermanentMaxSpacing() => _feild_permanent_max_spacing.Value;
+        public float FieldPermanentMaxSpacing() => _field_permanent_max_spacing.Value;
 
-        public float FeildCollapseTime() => _collapse_time.Value;
+        public float FieldCollapseTime() => _collapse_time.Value;
 
         public bool RotateInfoUIWithPermanent() => _rotate_info_ui_with_permanent.Value;
         public bool DCGOTweaksPermanentInfoUIStyle() => _dcgo_tweaks_permanent_info_ui_style.Value;
