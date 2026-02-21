@@ -39,8 +39,8 @@ Settings can be changed in `UserData/DCGOTweaks.cfg`
 ## Building From Source
 
 ### Requirements
-- Visual Studio 2026
-- Some version of Unity
+- Some version of Visual Studio (Im using 2026)
+- Some version of Unity (I have 6.2 Installed)
 - A modded version of DCGO
 - NuGet package: ImageSharp
 
