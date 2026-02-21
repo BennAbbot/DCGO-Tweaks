@@ -169,7 +169,7 @@ namespace DCGO_Tweaks
                     }
                 }
 
-                SpaceRow(spacing, _frames_with_permanents, _frames_with_new_permanents, offset);
+                SpaceRow(spacing, _frames_with_permanents, _frames_with_new_permanents, offset * _sort_dir);
             }
 
             void SpaceRow(float spacing, FrameComponentList frames_with_permanents, FrameComponentList frames_with_new_permanents, float centre_offset)
