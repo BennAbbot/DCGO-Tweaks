@@ -1,7 +1,7 @@
 ﻿using MelonLoader;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(DCGO_Tweaks.Core), "DCGO Tweaks", "1.0.1", "Lv.B", null)]
+[assembly: MelonInfo(typeof(DCGO_Tweaks.Core), "DCGO Tweaks", "1.0.2", "Lv.B", null)]
 [assembly: MelonGame("DCGO", "DCGO")]
 
 namespace DCGO_Tweaks
